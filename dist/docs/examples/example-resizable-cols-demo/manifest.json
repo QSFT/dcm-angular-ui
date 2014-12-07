@@ -1,0 +1,9 @@
+{
+  "name": "example-resizable-cols-demo",
+  "files": [
+    "index.html",
+    "script.js",
+    "style.css"
+    
+  ]
+}
