@@ -1,0 +1,9 @@
+{
+  "name": "example-slider-demo",
+  "files": [
+    "index.html",
+    "app.js",
+    "dcm-slider.css"
+    
+  ]
+}

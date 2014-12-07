@@ -1,0 +1,47 @@
+
+<h1>Directive components in <code>dcm-ui.grid</code></h1>
+
+
+
+<div class="component-breakdown">
+  <div>
+    <table class="definition-table">
+      <tr>
+        <th>Name</th>
+        <th>Description</th>
+      </tr>
+      
+      <tr>
+        <td><a href="dcm-ui.grid/directive/dcmGridColumn">dcmGridColumn</a></td>
+        <td><p>Creates a grid column. The contents of this tag will be compiled. Any attributes
+that aren&#39;t params will be duplicated onto this cell in each row.</p>
+</td>
+      </tr>
+      
+      <tr>
+        <td><a href="dcm-ui.grid/directive/dcmGrid">dcmGrid</a></td>
+        <td><p>Creates a grid from the array passed in via the datasource attribute. The dcm-grid-column
+ child tags configure each column in the grid. The contents of these tags is interpolated into
+ that column in the grid with the data from the current array item.</p>
+</td>
+      </tr>
+      
+      <tr>
+        <td><a href="dcm-ui.grid/directive/dcmGridRowActions">dcmGridRowActions</a></td>
+        <td><p>The contents of this element is transcluded into the row under the active grid
+ row (spanning all the cols). The parent dcm-grid thus must have the active-row attribute
+ specified. Also the data from the row is transcluded into the scope of this row.
+Because this is transcluded/compiled it may contain additional angular elements.</p>
+</td>
+      </tr>
+      
+      <tr>
+        <td><a href="dcm-ui.grid/directive/dcmGridRow">dcmGridRow</a></td>
+        <td><p>Allows attributes for each grid row (in tbody) to be passed to the grid</p>
+</td>
+      </tr>
+      
+    </table>
+  </div>
+</div>
+
