@@ -1,0 +1,10 @@
+{
+  "name": "{$ doc.example.id $}",
+  "files": [
+    "index.html"
+    {%- for file in doc.files %},
+    "{$ file $}"{% endfor %}
+    {% for script in doc.scripts %},
+    "{$ script.path $}"{% endfor %}
+  ]
+}

@@ -1,0 +1,49 @@
+{% block content %}
+
+{% block header %}
+<header>
+  <h1>{$ doc.name $}</h1>
+  <ul class="list-clear">
+    {% block related_components %}{% endblock %}
+    <li>- {$ doc.docType $} in module <a href="#/api/{$ doc.moduleDoc.module $}">{$ doc.moduleDoc.name $}</a></li>
+  </ul>
+</header>
+{% endblock %}
+
+{% block description %}
+<div class="api-profile-description">
+  {$ doc.description | marked $}
+</div>
+{% endblock %}
+
+{% if doc.deprecated %}
+<fieldset class="deprecated">
+  <legend>Deprecated API</legend>
+  {$ doc.deprecated| marked $}
+</fieldset>
+{% endif %}
+
+<div>
+  {% block dependencies %}
+  {%- if doc.requires %}
+  <h2 id="dependencies">Dependencies</h2>
+  <ul>
+    {% for require in doc.requires %}<li>{$ require | link $}</li>{% endfor %}
+  </ul>
+  {% endif -%}
+  {% endblock %}
+
+  {% block additional %}
+  {% endblock %}
+
+  {% block examples %}
+  {%- if doc.examples %}
+  <h2 id="example">Example</h2>
+  {%- for example in doc.examples -%}
+    {$ example | marked $}
+  {%- endfor -%}
+  {% endif -%}
+  {% endblock %}
+</div>
+
+{% endblock %}

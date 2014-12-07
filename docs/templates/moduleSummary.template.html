@@ -1,0 +1,4 @@
+{% for name, module in doc.modules.obj %}
+<h1><a href="#/api/{$ module.module $}">{$ module.module $}</a></h1>
+<p>{$ module.description | marked $}</p>
+{% endfor %}

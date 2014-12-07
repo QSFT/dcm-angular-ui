@@ -1,0 +1,49 @@
+{% block content %}
+
+  <h1>
+    {% if doc.title %}{$ doc.title | marked $}{% else %}{$ doc.name $}{% endif %}
+  </h1>
+
+  {$ doc.description | marked $}
+
+  <div class="component-breakdown">
+    <h2>Components</h2>
+    {% for componentGroup in doc.componentGroups %}
+    <div>
+      <h3 class="component-heading" id="{$ componentGroup.groupType | dashCase $}">{$ componentGroup.groupType | title $}</h3>
+      <table class="definition-table">
+        <thead>
+          <tr>
+            <th>Name</th>
+            <th>Description</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for component in componentGroup.components %}
+          <tr>
+            <td><a href="#/api/{$ doc.module $}/{$ componentGroup.groupType $}/{$ component.name $}">{$ component.name $}</a></td>
+            <td>{$ component.description | firstParagraph | marked $}</td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+    {% endfor %}
+  </div>
+
+  {% if doc.usage %}
+    <h2>Usage</h2>
+    {$ doc.usage | marked $}
+  {% endif %}
+
+
+  {% block examples %}
+  {%- if doc.examples %}
+  <h2 id="example">Example</h2>
+  {%- for example in doc.examples -%}
+    {$ example | marked $}
+  {%- endfor -%}
+  {% endif -%}
+  {% endblock %}
+
+{% endblock %}
