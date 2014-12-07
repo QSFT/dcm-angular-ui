@@ -1,0 +1,68 @@
+
+
+  <h1>
+    dcm-ui.multiple-input
+  </h1>
+
+  <p>The <code>dcm-ui.multiple-input</code> module provides a generic repeatable input field</p>
+
+
+  <div class="component-breakdown">
+    <h2>Components</h2>
+    
+    <div>
+      <h3 class="component-heading" id="directive">Directive</h3>
+      <table class="definition-table">
+        <thead>
+          <tr>
+            <th>Name</th>
+            <th>Description</th>
+          </tr>
+        </thead>
+        <tbody>
+          
+          <tr>
+            <td><a href="#/api/multiple-input/directive/multipleInput">multipleInput</a></td>
+            <td><p>Creates a multiple input control</p>
+</td>
+          </tr>
+          
+        </tbody>
+      </table>
+    </div>
+    
+  </div>
+
+  
+
+
+  
+  <h2 id="example">Example</h2><p>
+
+<div>
+<!--   <a ng-click="openPlunkr('examples/example-multi-input-demo')" class="btn pull-right">
+    <i class="glyphicon glyphicon-edit">&nbsp;</i>
+    Edit in Plunker</a> -->
+
+  <div class="runnable-example"
+      path="examples/example-multi-input-demo"
+      name="multi-input-demo"
+      module="dcm-ui.multiple-input">
+
+  
+    <div class="runnable-example-file" 
+      name="index.html"
+      language="html"
+      type="html">
+      <pre><code>&lt;form class=&quot;col-xs-6&quot; name=&quot;testForm&quot; novalidate ng-init=&quot;formFields = {email: [ &#39;jethro@example.com&#39;, &#39;jessie@example.com&#39; ]}&quot;&gt;&#10;&#10;    &lt;div class=&quot;well&quot;&gt;&#10;      Array: {{formFields.email}}&#10;    &lt;/div&gt;&#10;&#10;    &lt;multiple-input items=&quot;formFields.email&quot; type=&quot;email&quot; add-button-icon=&quot;fa fa-plus&quot; add-button-label=&quot;&quot; placeholder=&quot;Enter email&quot;&gt;&#10;&#10;    &lt;/multiple-input&gt;&#10;&#10;&lt;/form&gt;</code></pre>
+    </div>
+  
+
+    <iframe class="runnable-example-frame" src="examples/example-multi-input-demo/index.html" name="example-multi-input-demo"></iframe>
+  </div>
+</div>
+
+
+</p>
+
+

@@ -1,0 +1,221 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Example - example-grid-demo</title>
+  <link href="../../assets/bower_components/bootstrap/dist/css/bootstrap.css" rel="stylesheet" type="text/css">
+  <link href="../../assets/bower_components/fontawesome/css/font-awesome.css" rel="stylesheet" type="text/css">
+  <link href="../../assets/bower_components/select2/select2.css" rel="stylesheet" type="text/css">
+  <link href="../../assets/bower_components/select2-bootstrap-css/select2-bootstrap.css" rel="stylesheet" type="text/css">
+  <link href="dcm-grid-from-scss.css" rel="stylesheet" type="text/css">
+
+
+  <script src="../../assets/bower_components/underscore/underscore.js"></script>
+  <script src="../../assets/bower_components/jquery/dist/jquery.js"></script>
+  <script src="../../assets/bower_components/select2/select2.js"></script>
+  <script src="../../assets/bower_components/angular/angular.js"></script>
+  <script src="../../src/app.js"></script>
+  <script src="../../src/grid/main.js"></script>
+  <script src="../../src/grid/controllers/dcmGridController.js"></script>
+  <script src="../../src/grid/directives/dcmGridDirective.js"></script>
+  <script src="../../src/grid/directives/dcmGridColumnDirective.js"></script>
+  <script src="../../src/grid/directives/dcmGridRowDirective.js"></script>
+  <script src="../../src/grid/directives/dcmGridRowActionsDirective.js"></script>
+  <script src="../../src/grid/services/datasource.js"></script>
+  <script src="../../src/grid/services/filters.js"></script>
+  <script src="../../src/multiple-input/main.js"></script>
+  <script src="../../src/multiple-input/directives/multipleInput.js"></script>
+  <script src="../../src/select2/main.js"></script>
+  <script src="../../src/select2/directives/dcmSelect2.js"></script>
+  <script src="../../src/slider/main.js"></script>
+  <script src="../../src/slider/directives/dcmSlider.js"></script>
+  <script src="../../src/helpers/services/drag.js"></script>
+  <script src="../../src/resizable-cols/main.js"></script>
+  <script src="../../src/resizable-cols/directives/resizableColumns.js"></script>
+  <script src="../../src/resizable-cols/directives/resizableColumn.js"></script>
+  <script src="../../src/resizable-cols/controllers/resizableColumnsCtrl.js"></script>
+  <script src="first.js"></script>
+  <script src="app.js"></script>
+
+
+
+</head>
+<body ng-app="dcm-ui">
+   <div ng-controller="GridExampleCtrl">
+
+    <div class="panel panel-default">
+
+      <div class="panel-heading">
+        <h3 class="panel-title">Grid Setup</h3>
+      </div>
+
+      <div class="panel-body form-inline">
+
+        <div class="input-group input-group" style="float: left;">
+            <button class="btn btn btn-warning" ng-click="toggleConfig()">Configure Columns</button>
+        </div>
+
+        <div class="input-group input-group" style="margin-left: 5px; width: 160px; float: left;">
+            <span class="input-group-addon">Record Sets</span>
+            <input type="number" class="form-control input" placeholder="Sets" ng-model="dsOpts.iterations">
+        </div>
+
+        <div class="input-group input-group" style="width: 175px; margin-left: 5px; float: left;">
+            <span class="input-group-addon">Records/Set</span>
+            <input type="number" class="form-control input" placeholder="Records" ng-model="dsOpts.recordsPerIteration">
+        </div>
+
+        <div class="input-group input-group" style="margin-left: 5px; float: left;">
+            <button class="btn btn btn-primary" ng-click="datasource.loadData()">
+              <i ng-if="datasource.bLoading || datasource.bFiltering" class="fa fa-spin fa-spinner"></i> reload
+            </button>
+        </div>
+
+        <div class="input-group input-group" style="width: 175px; margin-left: 5px; float: right;">
+            <span class="input-group-addon">Records/Page</span>
+            <input type="number" class="form-control input" placeholder="Records" ng-model="paginationOptions.perPage">
+        </div>
+
+      </div>
+
+    </div>
+
+    <div class="panel panel-warning" ng-if="showConfig">
+
+      <div class="panel-heading">
+        <h3 class="panel-title">Columns</h3>
+      </div>
+
+      <div class="panel-body form">
+
+        <div class="checkbox" ng-repeat="col in serverGrid.cols">
+          <label>
+            <input type="checkbox" ng-model="col.enabled">
+            {{col.title}}
+          </label>
+        </div>
+
+      </div>
+
+      <div class="panel-footer">
+        <button class="btn btn-link text-danger" aria-hidden="true" ng-click="toggleConfig()">Cancel</button>
+        <button class="btn btn-primary" ng-click="serverGrid.cols.update(); toggleConfig();">Update</button>
+      </div>
+
+    </div>
+
+
+    <div class="panel panel-primary">
+
+      <div class="panel-heading">
+        <h3 class="panel-title">Example filters</h3>
+      </div>
+
+      <div class="panel-body form-inline">
+
+        <div class="form-group">
+          <input
+            type="hidden"
+            dcm-select2="{allowClear: true, placeholder: 'Any model...'}"
+            data="filter.data.models"
+            ng-model="filter.values.model"
+            class="form-control"
+            style="width:175px"
+          >
+        </div>
+
+        <div class='form-group'>
+          <input
+              ng-model="filter.values.serviceTag"
+              type='text'
+              class='form-control'
+              placeholder='Filter Service Tag'
+              style="width:175px"
+            >
+        </div>
+
+
+        <div class="form-group">
+          <div class="checkbox" style="margin-top: 7px; margin-bottom: 7px;">
+            <label>
+              <input type="checkbox" ng-model="filter.values.isOnline">
+              Only Online
+            </label>
+          </div>
+        </div>
+
+        <div class="form-filter pull-right">
+          <a ng-click="filter.resetFilters()" class="btn btn-clear btn-link pull-right">reset filters</a>
+        </div>
+
+
+      </div>
+
+    </div>
+
+
+    <div class="dcm-grid">
+
+      <dcm-grid
+        datasource="datasource.pageData"
+        width="100%"
+        active-row="serverGrid.activeServer"
+        selected="serverGrid.selectedServers"
+        sort-function="datasource.sortFunction"
+        sort-order="datasource.sortOrder"
+        edit-columns="serverGrid.cols"
+        store-config="grid.testGridConfig"
+      >
+
+        <dcm-grid-row ng-class="{muted: !isOnline}">
+          <dcm-grid-column title="Status" width="10%">
+              <span class="{{iconColor}}"><i class="fa {{icon}}"></i></span>
+          </dcm-grid-column>
+          <dcm-grid-column width="20%" title="IP Address" enabled="false">{{ip}}</dcm-grid-column>
+          <dcm-grid-column width="20%" title="Service Tag">{{serviceTag}}</dcm-grid-column>
+          <dcm-grid-column width="30%" title="Model">{{model}}</dcm-grid-column>
+          <dcm-grid-column width="20%" title="Memory" sort-type="integer" enabled="true">{{memory}}</dcm-grid-column>
+        </dcm-grid-row>
+
+        <dcm-grid-row-actions ng-class="{muted: !isOnline}">
+            We can include additional controls here for when a row is "active" (they are transcluded in the context of this row)
+        </dcm-grid-row-actions>
+
+      </dcm-grid>
+
+      <div class="clearfix"></div>
+
+      <div class="pull-left pagination">
+
+        <div class="pull-left">
+          Page {{datasource.currentPage}} of {{datasource.pages}},
+          Rows: {{datasource.viewData.length}}
+          <span ng-if="serverGrid.selectedServers.length > 0">, Selected: {{serverGrid.selectedServers.length}}
+        </div>
+
+      </div>
+
+      <ul class="pagination pull-right">
+        <li ng-class="{disabled: datasource.pages == 0 || datasource.currentPage == 1}">
+            <a ng-click="datasource.setPage(1)">first</a>
+        </li>
+
+        <li ng-class="{disabled: datasource.pages == 0 || datasource.currentPage == 1}">
+            <a  ng-click="datasource.setPage(datasource.currentPage-1)">prev</a>
+        </li>
+
+        <li ng-class="{disabled: datasource.pages == 0 || datasource.currentPage == datasource.pages}">
+            <a ng-click="datasource.setPage(datasource.currentPage+1)">next</a>
+        </li>
+
+        <li ng-class="{disabled: datasource.pages == 0 || datasource.currentPage == datasource.pages}">
+            <a ng-click="datasource.setPage(datasource.pages)">last</a>
+        </li>
+      </ul>
+
+
+    </div>
+
+</div>
+</body>
+</html>

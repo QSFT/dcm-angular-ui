@@ -1,0 +1,228 @@
+
+
+
+<header>
+  <h1>dcmGrid</h1>
+  <ul class="list-clear">
+    
+    <li>- directive in module <a href="#/api/grid">dcm-ui.grid</a></li>
+  </ul>
+</header>
+
+
+
+<div class="api-profile-description">
+  <p>Creates a grid from the array passed in via the datasource attribute. The dcm-grid-column
+ child tags configure each column in the grid. The contents of these tags is interpolated into
+ that column in the grid with the data from the current array item.</p>
+<p>The dcm-grid-row-actions content is transcluded into the currently active row.
+ The scope for that transclusion has the data from the array item copied into it, so you can use any
+ angular functionality. (unlike the individual cells)</p>
+<p>If a binding for the sort function is provided whenever a column is clicked a function to
+ calculate the value of each row is placed into it.</p>
+
+</div>
+
+
+
+
+<div>
+  
+
+  
+  <h2>Directive Info</h2>
+  <ul>
+    
+    <li>This directive executes at priority level 0.</li>
+  </ul>
+
+  
+  <h2 id="usage">Usage</h2>
+  <div class="usage">
+  
+    <pre><code class="lang-html">&lt;dcm-grid datasource=&quot;Array&quot;&gt;
+   &lt;dcm-grid-column&gt;{{col1}}&lt;/dcm-grid-column&gt;
+   &lt;dcm-grid-column&gt;{{col2}}&lt;/dcm-grid-column&gt;
+   ...
+   &lt;dcm-grid-row-actions&gt;
+       &lt;dcm-grid-row-action-buttons&gt;&lt;/dcm-grid-row-action-buttons&gt;
+   &lt;/dcm-grid-row-actions&gt;
+ &lt;/dcm-grid&gt;
+</code></pre>
+
+  
+  </div>
+  
+<section class="api-section">
+  <h3>Arguments</h3>
+
+<table class="variables-matrix input-arguments">
+  <thead>
+    <tr>
+      <th>Param</th>
+      <th>Type</th>
+      <th>Details</th>
+    </tr>
+  </thead>
+  <tbody>
+    
+    <tr>
+      <td>
+        datasource
+        
+        
+      </td>
+      <td>
+        <a href="" class="label type-hint type-hint-array">array</a>
+      </td>
+      <td>
+        <p>the data to be displayed in the grid</p>
+
+        
+      </td>
+    </tr>
+    
+    <tr>
+      <td>
+        activeRow
+        
+        <div><em>(optional)</em></div>
+      </td>
+      <td>
+        <a href="" class="label type-hint type-hint-string">string</a>
+      </td>
+      <td>
+        <p>variable to bind the active rows data to</p>
+
+        
+      </td>
+    </tr>
+    
+    <tr>
+      <td>
+        selected
+        
+        
+      </td>
+      <td>
+        <a href="" class="label type-hint type-hint-object">Object</a><a href="" class="label type-hint type-hint-array">Array</a>
+      </td>
+      <td>
+        <p>variable to bind the selected item data to
+ (object or array depending on if this is a single select)</p>
+
+        
+      </td>
+    </tr>
+    
+    <tr>
+      <td>
+        select-type
+        
+        <div><em>(optional)</em></div>
+      </td>
+      <td>
+        <a href="" class="label type-hint type-hint-string">string</a>
+      </td>
+      <td>
+        <p>type of select can be single or multiple</p>
+
+        <p><em>(default: multiple)</em></p>
+      </td>
+    </tr>
+    
+    <tr>
+      <td>
+        additionalRowData
+        
+        <div><em>(optional)</em></div>
+      </td>
+      <td>
+        <a href="" class="label type-hint type-hint-object">Object</a>
+      </td>
+      <td>
+        <p>variable containing additional data for
+ each row. This is used by the optional dcm-grid-row-actions element.</p>
+
+        
+      </td>
+    </tr>
+    
+    <tr>
+      <td>
+        sortFunction
+        
+        <div><em>(optional)</em></div>
+      </td>
+      <td>
+        <a href="" class="label type-hint type-hint-function">Function=</a>
+      </td>
+      <td>
+        <p>variable to bind the sort function provided when a col is clicked on</p>
+
+        
+      </td>
+    </tr>
+    
+    <tr>
+      <td>
+        sortOrder
+        
+        
+      </td>
+      <td>
+        <a href="" class="label type-hint type-hint-string">string</a>
+      </td>
+      <td>
+        <p>variable to bind the sort order string to (ASC/DESC)</p>
+
+        <p><em>(default: ASC)</em></p>
+      </td>
+    </tr>
+    
+  </tbody>
+</table>
+
+</section>
+  
+
+
+  
+  <h2 id="example">Example</h2><p>
+
+<div>
+<!--   <a ng-click="openPlunkr('examples/example-grid-demo1')" class="btn pull-right">
+    <i class="glyphicon glyphicon-edit">&nbsp;</i>
+    Edit in Plunker</a> -->
+
+  <div class="runnable-example"
+      path="examples/example-grid-demo1"
+      name="grid-demo"
+      module="dcm-ui.grid">
+
+  
+    <div class="runnable-example-file" 
+      name="index.html"
+      language="html"
+      type="html">
+      <pre><code> &lt;div ng-controller=&quot;GridExampleCtrl&quot;&gt;&#10;&#10;    &lt;dcm-grid&#10;      datasource=&quot;tableData&quot;&#10;      width=&quot;100%&quot;&#10;    &gt;&#10;&#10;      &lt;dcm-grid-row&gt;&#10;        &lt;dcm-grid-column title=&quot;Name&quot;&gt;{{fname}} {{lname}}&lt;/dcm-grid-column&gt;&#10;        &lt;dcm-grid-column title=&quot;Age&quot;&gt;{{age}}&lt;/dcm-grid-column&gt;&#10;        &lt;dcm-grid-column title=&quot;Serial&quot;&gt;{{uuid}}&lt;/dcm-grid-column&gt;&#10;      &lt;/dcm-grid-row&gt;&#10;&#10;      &lt;dcm-grid-row-actions&gt;&#10;          We can include additional controls here for when a row is &quot;active&quot; (they are transcluded in the context of this row)&#10;      &lt;/dcm-grid-row-actions&gt;&#10;&#10;    &lt;/dcm-grid&gt;&#10;&#10;&lt;/div&gt;</code></pre>
+    </div>
+  
+    <div class="runnable-example-file" 
+      name="app.js"
+      language="js"
+      type="js">
+      <pre><code>angular.module(&#39;dcm-ui.grid&#39;)&#10;.controller(&#39;GridExampleCtrl&#39;, [&#39;$scope&#39;, //  &#39;datasource&#39;, &#39;$log&#39;, &#39;filters&#39;, &#39;$q&#39;, &#39;$timeout&#39;,&#10;  function ($scope) { // , datasource, $log, filters, $q, $timeout&#10;&#10;  $scope.tableData = [&#10;    {fname: &#39;James&#39;, lname: &#39;Andersen&#39;, age: 41, uuid: &#39;ad6d4f60-27dd-41a4-bc58-4b66eb8cc2f7&#39;},&#10;    {fname: &#39;Albertine&#39;, lname: &#39;Roquefort&#39;, age: 19, uuid: &#39;a3483f04-6d88-4cab-94e8-f37d47140112&#39;},&#10;    {fname: &#39;Harry&#39;, lname: &#39;Elfsport&#39;, age: 52, uuid: &#39;752501b5-8c9c-4bf8-8dbf-549d247c54de&#39;},&#10;    {fname: &#39;Mojune&#39;, lname: &#39;Starkadder&#39;, age: 27, uuid: &#39;ed788226-7fd5-4c64-8065-63e88b5414df&#39;},&#10;    {fname: &#39;Julia&#39;, lname: &#39;Hazeldene&#39;, age: 84, uuid: &#39;da428eb5-3b7d-4c21-8b04-b0deaf54c4a0&#39;}&#10;  ];&#10;&#10;}]);</code></pre>
+    </div>
+  
+
+    <iframe class="runnable-example-frame" src="examples/example-grid-demo1/index.html" name="example-grid-demo1"></iframe>
+  </div>
+</div>
+
+
+</p>
+
+</div>
+
+

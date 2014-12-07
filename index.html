@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html ng-app='myApp'>
+<head>
+
+  <title>DCM Angular UI - Docs</title>
+
+  <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no">
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="mobile-web-app-capable" content="yes">
+
+  <script src='assets/js/cui-vendor.min.js'></script>
+  <script src='assets/js/cui.min.js'></script>
+
+  <link rel="stylesheet" href="assets/style/cui.min.css">
+
+  <link href="assets/bower_components/bootstrap/dist/css/bootstrap.css" rel="stylesheet">
+  <link href="assets/bower_components/fontawesome/css/font-awesome.css" rel="stylesheet">
+  <link href="assets/style/docs.css" rel="stylesheet">
+  <link href="assets/style/prettify-theme.css" rel="stylesheet">
+  <link href="assets/style/prettify.css" rel="stylesheet">
+
+  <script src="assets/bower_components/jquery/dist/jquery.js"></script>
+
+  <script src="assets/bower_components/marked/lib/marked.js"></script>
+  <script src="assets/bower_components/google-code-prettify/src/prettify.js"></script>
+  <script src="assets/bower_components/google-code-prettify/src/lang-css.js"></script>
+
+  <script src="assets/js/angular-bootstrap.js"></script>
+  <script src="assets/js/bootstrap-prettify.js"></script>
+
+  <style>
+    .cui-drawer {
+      display: none !important;
+    }
+
+    .cui-content>span {
+      width: 100%;
+    }
+  </style>
+
+
+</head>
+
+<body ng-controller='AppController'>
+
+  <cui-application-frame application-href="#/" application-name='DCM Angular UI' navigation-items='applicationframe.navigation' masthead-show-controls='true'>
+
+    <div ng-view> </div>
+
+  </cui-application-frame>
+
+
+  <script>
+    angular.module('myApp', ['cui', 'ngRoute', 'bootstrap', 'bootstrapPrettify'])
+
+      .config(function ($routeProvider) {
+         $routeProvider
+            .when('/', {
+              templateUrl: 'views/summary.html',
+              controller: 'DefaultController'
+            })
+            .when('/api/:moduleName/:componentType/:componentName', {
+              templateUrl: function(urlParams) {
+                return 'views/' + urlParams.moduleName + '/' + urlParams.componentType + '/' + urlParams.componentName + '.html';
+              },
+              controller: 'DefaultController'
+            })
+            .when('/api/:moduleName', {
+              templateUrl: function(urlParams) {
+                return 'views/' + urlParams.moduleName + '/index.html';
+              },
+              controller: 'DefaultController'
+            })
+            .otherwise({
+              redirectTo: '/'
+            })
+          ;
+      })
+
+      .directive('code', function() {
+        return {
+          restrict: 'E',
+          terminal: true,
+          compile: function(element) {
+            var linenums = element.hasClass('linenum');// || element.parent()[0].nodeName === 'PRE';
+            var match = /lang-(\S+)/.exec(element[0].className);
+            var lang = match && match[1];
+            var html = element.html();
+            element.html(window.prettyPrintOne(html, lang, linenums));
+          }
+        };
+      })
+
+      .controller('DefaultController', angular.noop)
+
+      .controller('AppController', function($scope, $routeParams) {
+
+        $scope.applicationframe = {
+          navigation: [
+            {
+              label: 'Home',
+              icon: 'home',
+              href: '#/'
+            }
+
+            ,
+            {
+              label: 'grid',
+              href: '#/api/grid'
+            }
+
+            ,
+            {
+              label: 'helpers',
+              href: '#/api/helpers'
+            }
+
+            ,
+            {
+              label: 'multiple-input',
+              href: '#/api/multiple-input'
+            }
+
+            ,
+            {
+              label: 'resizable-cols',
+              href: '#/api/resizable-cols'
+            }
+
+            ,
+            {
+              label: 'select2',
+              href: '#/api/select2'
+            }
+
+            ,
+            {
+              label: 'slider',
+              href: '#/api/slider'
+            }
+
+          ]
+        };
+
+      })
+
+    ;
+  </script>
+
+</body>
+</html>

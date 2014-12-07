@@ -1,0 +1,11 @@
+{
+  "name": "example-grid-demo",
+  "files": [
+    "index.html",
+    "first.js",
+    "app.js",
+    "dcm-grid-from-scss.css",
+    "dcm-grid.scss"
+    
+  ]
+}
