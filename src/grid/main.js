@@ -8,7 +8,7 @@
  * The `dcm-ui.grid` module provides an angular based grid component.
  * Also includes a service for managing the grid datasource and filters.
  *
- * requires: underscore.js, angular-ui-bootstrap, jQuery</p>
+ * requires: underscore.js, jQuery</p>
  *
  * @example
    <example name="grid-demo" module="dcm-ui" style="height:1600px;">

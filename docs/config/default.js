@@ -11,8 +11,6 @@ module.exports = function defaultDeployment() {
           '/assets/bower_components/select2/select2.js',
           '/assets/bower_components/angular/angular.js',
 
-//          '/assets/bower_components/angular-mocks/angular-mocks.js',
-
           '/src/app.js',
 
           '/src/grid/main.js',
