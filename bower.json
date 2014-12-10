@@ -2,17 +2,15 @@
   "name": "dcm-angular-ui",
   "version": "0.1.1",
   "homepage": "https://github.com/dell-oss/dcm-angular-ui",
-  "authors": [
-    "Nick Shearer <nick.shearer@software.dell.com>"
-  ],
   "description": "Angular UI components (grid, select, slider etc)",
   "license": "Apache 2.0",
-  "private": false,
   "ignore": [
     "**/.*",
-    "node_modules",
-    "docs/assets/bower_components",
-    "dist/docs/assets/bower_components"
+    "karma*.*",
+    "node_modules/**",
+    "docs/**",
+    "test/**",
+    "tmp/**"
   ],
   "dependencies": {},
   "devDependencies": {
