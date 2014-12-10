@@ -191,10 +191,7 @@ angular.module('dcm-ui.slider')
 
             });
 
-            // delay position calculation until after all dom changes are complete
-            $timeout(function(){
-              updatePositions();
-            },0);
+            updatePositions();
 
           } else if (ds && ds.length === 1) {
             $scope.selected = ds[0];
@@ -225,6 +222,13 @@ angular.module('dcm-ui.slider')
 
         $scope.$on('$destroy', function(){
           angular.element($window).unbind('resize', windowResize);
+        });
+
+        // watch container width in case it changes
+        $scope.$watch(function(){ return container[0].offsetWidth; }, function(n, o){
+          if(n !== o) {
+            updatePositions();
+          }
         });
 
 
