@@ -6,7 +6,7 @@
     "Nick Shearer <nick.shearer@software.dell.com>"
   ],
   "description": "Angular UI components (grid, select, slider etc)",
-  "license": "MIT",
+  "license": "Apache 2.0",
   "private": false,
   "ignore": [
     "**/.*",
