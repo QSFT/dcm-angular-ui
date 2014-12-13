@@ -189,8 +189,22 @@ gulp.task('build', function(callback) {
 
 
 gulp.task('doc-assets', function () {
-  return gulp.src( paths.docSrc + '/assets/{bower_components,js,style}/**')
-      .pipe(gulp.dest(paths.build + '/docs/assets'));
+
+  var defaultDeployment = require('./docs/config/default');
+  var deployment = defaultDeployment();
+
+  var copyFiles = deployment.examples.copyFiles.scripts
+    .concat(deployment.examples.copyFiles.stylesheets)
+    .concat(deployment.examples.copyFiles.misc)
+    .concat(deployment.indexPage.copyFiles.scripts)
+    .concat(deployment.indexPage.copyFiles.stylesheets)
+    .concat(deployment.indexPage.copyFiles.misc)
+  ;
+
+
+  return gulp.src(copyFiles, {cwd: 'docs', base: 'docs'})
+    .pipe(gulp.dest(paths.build + '/docs'));
+
 });
 
 gulp.task('doc-main-js', function () {
@@ -209,7 +223,6 @@ gulp.task('clean-docs', function() {
     .pipe(clean())
   ;
 });
-
 
 
 
@@ -240,10 +253,8 @@ gulp.task('server', ['dev'], function () {
     ;
   });
 
-
-  // watch output docs dir (but ignore junk coming from bowewr_components)
-  gulp.watch(['dist/docs/**', '!dist/docs/assets/bower_components/**'], _.debounce(browserSync.reload, 100));
-
+  // watch output docs dir
+  gulp.watch(['dist/docs/**'], _.debounce(browserSync.reload, 100));
 
 
 });
@@ -272,11 +283,6 @@ gulp.task('dev', ['build'], function() {
     },
     notify: false
   });
-
-  //open browser
-  // return gulp.src('dist/docs/index.html')
-  //   .pipe( browser('index.html', { url: 'http://localhost:' + serverport + '/#/' }) )
-  // ;
 
 });
 

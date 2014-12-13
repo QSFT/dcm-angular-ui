@@ -35,6 +35,7 @@ module.exports = new Package('dcm-angular-ui-primary', [
   // add index file generator
   .processor(require('./processors/index-page'))
 
+  .factory(require('./config/default'))
 
 
 ;

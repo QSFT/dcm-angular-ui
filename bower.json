@@ -9,6 +9,7 @@
     "karma*.*",
     "node_modules/**",
     "docs/**",
+    "dist/docs/**",
     "test/**",
     "tmp/**"
   ],

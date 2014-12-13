@@ -4,7 +4,9 @@
  * Generate documents for each module
  */
 
-module.exports = function generateIndexPage(moduleMap) {
+module.exports = function generateIndexPage(moduleMap, defaultDeployment) {
+
+  var _ = require('lodash');
 
   return {
 
@@ -18,6 +20,12 @@ module.exports = function generateIndexPage(moduleMap) {
         modules: moduleMap,
         outputPath: 'index.html',
       };
+
+      // Copy in the common scripts and stylesheets
+      var commonFiles = (defaultDeployment.indexPage && defaultDeployment.indexPage.commonFiles) || {};
+      indexDoc.scripts = _.map(commonFiles.scripts, function(script) { return { path: script }; });
+      indexDoc.stylesheets = _.map(commonFiles.stylesheets || [], function(stylesheet) { return { path: stylesheet }; });
+
 
       // remove all current docs and replace with only this one
       // docs.splice(0, docs.length);
