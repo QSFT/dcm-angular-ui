@@ -32,9 +32,6 @@ describe('Directive: dcmSlider', function () {
 
     scope.$digest();
 
-    // there is a timeout before positions of things are calculated
-    $timeout.flush();
-
     // these are in reverse order from the cols, as each is appended after the table
     dragHandle = host.find('.dcm-slider-drag-handle').eq(0);
     slider = host.find('.dcm-slider').eq(0);
