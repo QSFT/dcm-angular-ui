@@ -13,6 +13,20 @@ Also includes a service for managing the grid datasource and filters.</p>
 <p><p>The <code>dcm-ui.multiple-input</code> module provides a generic repeatable input field</p>
 </p>
 
+<h1><a href="#/api/password">password</a></h1>
+<p><p>The <code>dcm-ui.password</code> module provides a directive implementing modified Stanford password validation rules.</p>
+<ul>
+ <li>Password length &lt; 12 requires number, upper/lower letters, special chararacters</li>
+ <li>Password length 12-15 requires number, upper/lower letters</li>
+ <li>Password length 16-19 requires upper/lower letters</li>
+ <li>Password length &gt; 19 has no requirements</li>
+</ul>
+Note: The directive does not implement the following Stanford validation rules:
+<ul>
+ <li>The password cannot match a previous password used by the user.</li>
+ <li>The password cannot be a single dictionary word.</li>
+</ul></p>
+
 <h1><a href="#/api/resizable-cols">resizable-cols</a></h1>
 <p><p>The <code>dcm-ui.resizable-cols</code> module allows you to set table columns as resizable</p>
 </p>

@@ -3,7 +3,7 @@ node_modules
 .sass-cache
 tmp
 docs/assets/bower_components
-app/coverage
+test/coverage
 "Find Results"
 .idea
 *.iml
