@@ -42,7 +42,7 @@
     "type": "git",
     "url": "git://github.com/enStratus/dell-angular-ui.git"
   },
-  "license": "Apache 2",
+  "license": "Apache 2.0",
   "bugs": {
     "url": "https://github.com/enStratus/dell-angular-ui/issues"
   },
