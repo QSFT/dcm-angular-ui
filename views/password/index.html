@@ -1,0 +1,78 @@
+
+
+  <h1>
+    dcm-ui.password
+  </h1>
+
+  <p>The <code>dcm-ui.password</code> module provides a directive implementing modified Stanford password validation rules.</p>
+<ul>
+ <li>Password length &lt; 12 requires number, upper/lower letters, special chararacters</li>
+ <li>Password length 12-15 requires number, upper/lower letters</li>
+ <li>Password length 16-19 requires upper/lower letters</li>
+ <li>Password length &gt; 19 has no requirements</li>
+</ul>
+Note: The directive does not implement the following Stanford validation rules:
+<ul>
+ <li>The password cannot match a previous password used by the user.</li>
+ <li>The password cannot be a single dictionary word.</li>
+</ul>
+
+  <div class="component-breakdown">
+    <h2>Components</h2>
+    
+    <div>
+      <h3 class="component-heading" id="directive">Directive</h3>
+      <table class="definition-table">
+        <thead>
+          <tr>
+            <th>Name</th>
+            <th>Description</th>
+          </tr>
+        </thead>
+        <tbody>
+          
+          <tr>
+            <td><a href="#/api/password/directive/dcmPassword">dcmPassword</a></td>
+            <td><p>Provides a password validator implementing modified Stanford password rules</p>
+</td>
+          </tr>
+          
+        </tbody>
+      </table>
+    </div>
+    
+  </div>
+
+  
+
+
+  
+  <h2 id="example">Example</h2><p>
+
+<div>
+<!--   <a ng-click="openPlunkr('examples/example-password-demo')" class="btn pull-right">
+    <i class="glyphicon glyphicon-edit">&nbsp;</i>
+    Edit in Plunker</a> -->
+
+  <div class="runnable-example"
+      path="examples/example-password-demo"
+      name="password-demo"
+      module="dcm-ui.password">
+
+  
+    <div class="runnable-example-file" 
+      name="index.html"
+      language="html"
+      type="html">
+      <pre><code>&lt;div ng-form=&quot;registerForm&quot; class=&quot;form-group&quot;&gt;&#10;  &lt;label&gt;Password:&lt;/label&gt;&#10;  &lt;input type=&quot;password&quot; dcm-password required minlength=&quot;8&quot; maxlength=&quot;128&quot; name=&quot;password&quot; ng-model=&quot;pwd&quot; class=&quot;form-control&quot; /&gt;&#10;  &lt;span class=&quot;help-block&quot;&gt;&#10;    &lt;div ng-show=&quot;registerForm.password.$error.minlength || registerForm.password.$error.maxlength || registerForm.password.$error.required&quot;&gt;8 - 128 characters. Longer passwords have fewer restrictions.&lt;/div&gt;&#10;    &lt;div ng-show=&quot;registerForm.password.$error.dcmPasswordLowercase&quot;&gt;One lower case letter.&lt;/div&gt;&#10;    &lt;div ng-show=&quot;registerForm.password.$error.dcmPasswordUppercase&quot;&gt;One upper case letter.&lt;/div&gt;&#10;    &lt;div ng-show=&quot;registerForm.password.$error.dcmPasswordNumber&quot;&gt;One number.&lt;/div&gt;&#10;    &lt;div ng-show=&quot;registerForm.password.$error.dcmPasswordSpecial&quot;&gt;One special character (!, @, #, $, %, etc).&lt;/div&gt;&#10;    &lt;div ng-show=&quot;registerForm.password.$valid&quot;&gt;Password valid!&lt;/div&gt;&#10;  &lt;/span&gt;&#10;&lt;/div&gt;</code></pre>
+    </div>
+  
+
+    <iframe class="runnable-example-frame" src="examples/example-password-demo/index.html" name="example-password-demo"></iframe>
+  </div>
+</div>
+
+
+</p>
+
+
