@@ -77,6 +77,12 @@ angular.module('dcm-ui.resizable-cols')
               // position drag handle
               positionDragHandle();
 
+              // make sure the cell is sized
+              // if this cell doesn't have a style attribute with width set, set one
+              if (!cell.attr('style') || !cell.attr('style').match(/(\b|;)\s*width\s*:/)) {
+                cell.width(cell.width());
+              }
+
             }, 0);
 
 
@@ -195,6 +201,7 @@ angular.module('dcm-ui.resizable-cols')
               if (widths.combined <= (widths.min + widths.minNext) ) {
 
                 $log.info('RESIZABLE: both cols are too narrow to resize further');
+                return false;
 
               } else {
 

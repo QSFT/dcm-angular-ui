@@ -25,10 +25,10 @@ describe('Directive: resizableColumn', function () {
     parent = angular.element('<tr></tr>');
 
     col1 = angular.element('<th style="width: 20px;">Col1</th>');
-    col2 = angular.element('<th class="resizable-column" style="width:29%">Col #2</th>');
-    col3 = angular.element('<th class="resizable-column" style="width:29%">This is column  number three</th>');
-    col4 = angular.element('<th class="resizable-column" style="width:29%">c4</th>');
-    col5 = angular.element('<th style="width: 10%">c5</th>');
+    col2 = angular.element('<th class="resizable-column">Col #2</th>');
+    col3 = angular.element('<th class="resizable-column" style="width:29%;">This is column  number three</th>');
+    col4 = angular.element('<th class="resizable-column" style="width:29%;">c4</th>');
+    col5 = angular.element('<th style="width:10%">c5</th>');
 
     parentTable.append(parent);
     parent.append([col1,col2,col3,col4,col5]);
@@ -121,6 +121,17 @@ describe('Directive: resizableColumn', function () {
 
   }));
 
+  it('should set style/width attributes on all cells widthout one', function(){
+    expect(col2.attr('style').match(/(\b|;)\s*width\s*:\s*\d+px\s*;\s*/)).toBeTruthy();
+  });
+
+  it('should not change style/width attributes on cells that already have them (except final cell)', function(){
+    expect(col3.attr('style').match(/(\b|;)\s*width\s*:\s*29%\s*;\s*/)).toBeTruthy();
+  });
+
+  it('should set the last cols style/width attribute to auto', function(){
+    expect(col4.attr('style').match(/(\b|;)\s*width\s*:\s*auto\s*;\s*/)).toBeTruthy();
+  });
 
 
   it('should allow us to resize the cell down', function(){
