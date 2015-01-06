@@ -14,7 +14,7 @@ angular.module('dcm-ui.slider')
  *
  */
 
-.directive('dcmSlider', ['$document', 'dragHelper', '$window', '$timeout', function ($document, dragHelper, $window, $timeout) {
+.directive('dcmSlider', ['$document', 'dragHelper', '$window', function ($document, dragHelper, $window) {
 
   return {
 
