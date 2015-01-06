@@ -48,8 +48,7 @@ angular.module('dcm-ui.helpers.drag', [])
       };
 
 
-      var mouseUp = function(e) {
-
+      var cancelDrag = function() {
         dragCursorCSS.remove();
 
         // undo jqLite bindings
@@ -57,6 +56,11 @@ angular.module('dcm-ui.helpers.drag', [])
         $document.off('mousemove', mouseMoved);
 
         $element.on('mousedown', mouseDown);
+      };
+
+      var mouseUp = function(e) {
+
+        cancelDrag();
 
         // apply changes to scope (as this is trigged by jquery mouse evt)
         $element.scope().$apply(function(){
@@ -95,7 +99,10 @@ angular.module('dcm-ui.helpers.drag', [])
 
           // apply changes to scope (as this is trigged by jquery mouse evt)
           $element.scope().$apply(function(){
-            options.mouseDown(getPosition(e));
+            var result = options.mouseDown(getPosition(e));
+            if (result === false) {
+              cancelDrag();
+            }
           });
 
           //prevent text selection
