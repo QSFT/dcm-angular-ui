@@ -19,6 +19,25 @@ describe('Directive: dcmPassword', function () {
     form = scope.form;
   }));
 
+
+  it('should be valid if no entry has been made yet', inject(function () {
+    // password length = 8 (8 < 12) and requirements met (valid)
+    form.pw.$setViewValue('');
+    scope.$digest();
+    expect(scope.pw).toBe('');
+    expect(form.pw.$valid).toBeTruthy();
+  }));
+
+  it('should be invalid if no conditions are met', inject(function () {
+    // password length = 8 (8 < 12) and requirements met (valid)
+    form.pw.$setViewValue('x');
+    scope.$digest();
+    expect(form.pw.$valid).toBeFalsy();
+    expect(form.pw.$error.dcmPasswordNumber).toBeTruthy();
+    expect(form.pw.$error.dcmPasswordLowercase).toBeFalsy();
+    expect(form.pw.$error.dcmPasswordUppercase).toBeTruthy();
+  }));
+
   it('should check a password with length=8 and requirements met', inject(function () {
     // password length = 8 (8 < 12) and requirements met (valid)
     form.pw.$setViewValue('ab12AB@#');
