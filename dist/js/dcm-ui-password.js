@@ -25,11 +25,12 @@
         <label>Password:</label>
         <input type="password" dcm-password required minlength="8" maxlength="128" name="password" ng-model="pwd" class="form-control" />
         <span class="help-block">
-          <div ng-show="registerForm.password.$error.minlength || registerForm.password.$error.maxlength || registerForm.password.$error.required">8 - 128 characters. Longer passwords have fewer restrictions.</div>
+          <div ng-show="registerForm.password.$error.minlength || registerForm.password.$error.maxlength">Password must be 8 - 128 characters. Longer passwords have fewer restrictions.</div>
           <div ng-show="registerForm.password.$error.dcmPasswordLowercase">One lower case letter.</div>
           <div ng-show="registerForm.password.$error.dcmPasswordUppercase">One upper case letter.</div>
           <div ng-show="registerForm.password.$error.dcmPasswordNumber">One number.</div>
           <div ng-show="registerForm.password.$error.dcmPasswordSpecial">One special character (!, @, #, $, %, etc).</div>
+          <div ng-show="registerForm.password.$error.required">Password is required.</div>
           <div ng-show="registerForm.password.$valid">Password valid!</div>
         </span>
       </div>
@@ -83,14 +84,18 @@ angular.module('dcm-ui.password')
 
           // iterate through validation rules and fail validation if any rule fails
           var testresult;
+
           for (var test in validation.rules) {
-            if (value.length >= validation.rules[test].minlength && value.length <= validation.rules[test].maxlength) {
+
+            if (!ctrl.$isEmpty(value) && value.length >= validation.rules[test].minlength &&
+              value.length <= validation.rules[test].maxlength) {
               testresult = validation.rules[test].rule.test(value);
             } else {
               testresult = true;
             }
 
             ctrl.$setValidity(test, testresult);
+
             valid = valid && testresult;
 
           }

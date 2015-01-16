@@ -32,11 +32,12 @@ Note: The directive does not implement the following Stanford validation rules:
         <label>Password:</label>
         <input type="password" dcm-password required minlength="8" maxlength="128" name="password" ng-model="pwd" class="form-control" />
         <span class="help-block">
-          <div ng-show="registerForm.password.$error.minlength || registerForm.password.$error.maxlength || registerForm.password.$error.required">8 - 128 characters. Longer passwords have fewer restrictions.</div>
+          <div ng-show="registerForm.password.$error.minlength || registerForm.password.$error.maxlength">Password must be 8 - 128 characters. Longer passwords have fewer restrictions.</div>
           <div ng-show="registerForm.password.$error.dcmPasswordLowercase">One lower case letter.</div>
           <div ng-show="registerForm.password.$error.dcmPasswordUppercase">One upper case letter.</div>
           <div ng-show="registerForm.password.$error.dcmPasswordNumber">One number.</div>
           <div ng-show="registerForm.password.$error.dcmPasswordSpecial">One special character (!, @, #, $, %, etc).</div>
+          <div ng-show="registerForm.password.$error.required">Password is required.</div>
           <div ng-show="registerForm.password.$valid">Password valid!</div>
         </span>
       </div>
