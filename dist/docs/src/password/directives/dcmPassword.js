@@ -43,14 +43,18 @@ angular.module('dcm-ui.password')
 
           // iterate through validation rules and fail validation if any rule fails
           var testresult;
+
           for (var test in validation.rules) {
-            if (value.length >= validation.rules[test].minlength && value.length <= validation.rules[test].maxlength) {
+
+            if (!ctrl.$isEmpty(value) && value.length >= validation.rules[test].minlength &&
+              value.length <= validation.rules[test].maxlength) {
               testresult = validation.rules[test].rule.test(value);
             } else {
               testresult = true;
             }
 
             ctrl.$setValidity(test, testresult);
+
             valid = valid && testresult;
 
           }
