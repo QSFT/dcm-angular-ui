@@ -38,7 +38,7 @@ angular.module('dcm-ui.select2')
       transclude: false,
       compile: function compile(tElement) { // tElement , tAttrs, transclude
 
-        if (!tElement.is('input[type=hidden]')) {
+        if (!tElement.is('[type=hidden]')) {
           throw('only <input type="hidden"> tags can have this attribute');
         }
 
