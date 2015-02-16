@@ -29,9 +29,9 @@ $ bower install dcm-angular-ui
 >
 ``` html
 <script src="bower_components/angular/angular.js"></script>
-<script src="bower_components/dcm-angular-ui/dist/dcm-ui-helpers.min.js"></script>
-<script src="bower_components/dcm-angular-ui/dist/dcm-ui-grid.min.js"></script>
-<script src="bower_components/dcm-angular-ui/dist/dcm-ui-resizable-cols.min.js"></script>
+<script src="bower_components/dcm-angular-ui/dist/js/dcm-ui-helpers.min.js"></script>
+<script src="bower_components/dcm-angular-ui/dist/js/dcm-ui-grid.min.js"></script>
+<script src="bower_components/dcm-angular-ui/dist/js/dcm-ui-resizable-cols.min.js"></script>
 ```
 
 + Inject the relevant `dcm-ui` module into your app:
