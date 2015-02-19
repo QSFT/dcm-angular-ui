@@ -172,9 +172,12 @@ describe('Directive: dcmGrid,', function () {
 
     // commenting out, don't need this behaviour yet.
     // will need watchers for each row. potentially deep watchers if we want to support nested props
-    xit('should update cell content if data changes ', function(){
+    it('should update cell content if data changes ', function(){
 
       var bodyRows = element.find('tbody tr');
+
+      scope.$digest();
+
       expect(bodyRows.eq(1).find('td').eq(0).text()).toBe('Cloud Resource Manager');
 
       scope.testData[1].name = 'Clown Resource Manager';
@@ -182,6 +185,7 @@ describe('Directive: dcmGrid,', function () {
       scope.$digest();
 
       expect(bodyRows.eq(1).find('td').eq(0).text()).toBe('Clown Resource Manager');
+      expect(bodyRows.eq(2).find('td').eq(0).text()).toBe('Basic User');
 
     });
 
