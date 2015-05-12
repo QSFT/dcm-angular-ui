@@ -31,26 +31,23 @@ angular.module('dcm-ui.slider')
 
     compile: function() { // tElement, tAttrs
 
-      var container = angular.element('<div class="dcm-slider">');
-
-      // create the container for click areas / markers
-      var selectAreaContainer = angular.element('<a class="dcm-slider-select-areas"></a>');
-      container.append(selectAreaContainer);
-
-
-      var barContainer = angular.element('<div class="dcm-slider-bar-container">');
-      var bar = angular.element('<div class="dcm-slider-bar">');
-      barContainer.append(bar);
-      container.append(barContainer);
-
-      // create the drag handle and add it to the page
-      var dragHandle = angular.element('<a class="dcm-slider-drag-handle"></a>');
-      container.append(dragHandle);
-
-
-
-
       return function($scope, iElement, iAttrs, ctrl) {
+
+        var container = angular.element('<div class="dcm-slider">');
+
+        // create the container for click areas / markers
+        var selectAreaContainer = angular.element('<a class="dcm-slider-select-areas"></a>');
+        container.append(selectAreaContainer);
+
+
+        var barContainer = angular.element('<div class="dcm-slider-bar-container">');
+        var bar = angular.element('<div class="dcm-slider-bar">');
+        barContainer.append(bar);
+        container.append(barContainer);
+
+        // create the drag handle and add it to the page
+        var dragHandle = angular.element('<a class="dcm-slider-drag-handle"></a>');
+        container.append(dragHandle);
 
         // this element can't have content...
         iElement.empty();
