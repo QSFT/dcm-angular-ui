@@ -10,14 +10,16 @@ module.exports = function generateIndexPage(moduleMap, defaultDeployment) {
 
   return {
 
-    $runAfter: ['adding-extra-docs'],
-    $runBefore: ['extra-docs-added'],
+    $runAfter: ['moduleDocsProcessor'],
+    $runBefore: ['computing-paths'],
     $process: function(docs) {
+
+      var dcmModules = [];
 
       var indexDoc = {
         id: 'indexPage',
         docType: 'indexPage',
-        modules: moduleMap,
+        dcmModules: dcmModules,
         outputPath: 'index.html',
       };
 
@@ -26,19 +28,21 @@ module.exports = function generateIndexPage(moduleMap, defaultDeployment) {
       indexDoc.scripts = _.map(commonFiles.scripts, function(script) { return { path: script }; });
       indexDoc.stylesheets = _.map(commonFiles.stylesheets || [], function(stylesheet) { return { path: stylesheet }; });
 
+      _.forEach(moduleMap.obj, function(mod, idx){
+        dcmModules.push({name:idx, module: mod.module, description: mod.description});
+      });
 
-      // remove all current docs and replace with only this one
-      // docs.splice(0, docs.length);
       docs.push(indexDoc);
 
       indexDoc = {
         id: 'moduleSummary',
         docType: 'moduleSummary',
-        modules: moduleMap,
+        dcmModules: dcmModules,
         outputPath: 'views/summary.html',
       };
 
       docs.push(indexDoc);
+
 
     }
 

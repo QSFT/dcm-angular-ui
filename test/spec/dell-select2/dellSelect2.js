@@ -7,20 +7,44 @@ describe('Directive: dcmSelect2', function () {
 
   var scope, compile, host;
 
+  // This is the equivalent of the old waitsFor syntax
+  // which was removed from Jasmine 2
+  var waitsFor = function(escapeFunction, escapeTime) {
+    // check the escapeFunction every millisecond so as soon as it is met we can escape the function
+    var interval = setInterval(function() {
+      if (escapeFunction()) {
+        clearMe();
+      }
+    }, 1);
+
+    // in case we never reach the escapeFunction, we will time out
+    // at the escapeTime
+    var timeOut = setTimeout(function() {
+      clearMe();
+    }, escapeTime);
+
+    // clear the interval and the timeout
+    function clearMe(){
+      clearInterval(interval);
+      clearTimeout(timeOut);
+    }
+  };
+
+
   beforeEach(inject(function ($rootScope, $compile) {
     scope = $rootScope.$new();
     compile = $compile;
 
     scope.minimalData = [
-      { id: 'user0', text: 'Disabled User', locked: true},
+      { id: 'user0', text: 'Disabled User', locked: true, icon:'test-icon'},
       { id: 'user1', text: 'Jane Doe', locked: false},
-      { id: 'user2', text: 'John Doe', locked: true }
+      { id: 'user2', text: 'John Doe', locked: true}
     ];
 
     scope.oddKeyData = [
-      { xid: 'user0', xtext: 'Disabled User', locked: true},
-      { xid: 'user1', xtext: 'Jane Doe', locked: false},
-      { xid: 'user2', xtext: 'John Doe', locked: true }
+      { xid: 'user0', xtext: 'Disabled User', xicon:'test-icon', locked: true},
+      { xid: 'user1', xtext: 'Jane Doe', xicon:'test-icon2', locked: false},
+      { xid: 'user2', xtext: 'John Doe', xicon:'test-icon3', locked: true }
     ];
 
     // create a host div in the actual dom
@@ -99,6 +123,33 @@ describe('Directive: dcmSelect2', function () {
 
   });
 
+
+  it('should allow us to specify an icon in the data', function(){
+
+    var element = compile('<input type="hidden" dcm-select2 ng-model="selectedVal" data="minimalData"/>')(scope);
+    host.append(element);
+    compile(host)(scope);
+    scope.$digest();
+
+   // open the results dropdown (and wait until it has opened)
+    var bComplete = false;
+    element.one('select2-open', function(){
+      bComplete = true;
+    });
+    element.select2('open');
+    scope.$digest();
+    waitsFor(function(){ return bComplete; }, 1500);
+
+    // first entry should have the icon specified in the data
+    expect($('ul.select2-results .select2-result-label:first i').attr('class')).toBe('select2-inline-icon test-icon');
+
+    // select first result and make sure icon shows in selection still
+    selectAsUser(element,0);
+    expect(getContainer(element).find('span.select2-chosen i').attr('class')).toBe('select2-inline-icon test-icon');
+
+  });
+
+
   describe('with opt groups', function(){
 
     beforeEach(function(){
@@ -173,13 +224,13 @@ describe('Directive: dcmSelect2', function () {
 
 
 
-  it('should allow the text/id fields to be specified', function(){
+  it('should allow the text/id/icon fields to be specified', function(){
     scope.selectedVal = 'user2';
-    var element = compile('<input type="hidden" dcm-select2 ng-model="selectedVal" data="oddKeyData" id-field="xid" text-field="xtext" />')(scope);
+    var element = compile('<input type="hidden" dcm-select2 ng-model="selectedVal" data="oddKeyData" id-field="xid" text-field="xtext" icon-field="xicon" />')(scope);
     scope.$digest();
     expect(scope.selectedVal).toBe('user2');
-    expect(getContainer(element).find('span.select2-chosen').text()).toBe('John Doe');
-
+    expect(getContainer(element).find('span.select2-chosen').text()).toBe(' John Doe');
+    expect(getContainer(element).find('span.select2-chosen i').attr('class')).toBe('select2-inline-icon test-icon3');
   });
 
 
@@ -319,7 +370,7 @@ describe('Directive: dcmSelect2', function () {
 
     });
 
-    it('should xxxx', function(){
+    it('should be an empty array when nothing is selected', function(){
 
       scope.selectedVal = null;
 
@@ -586,5 +637,131 @@ describe('Directive: dcmSelect2', function () {
     expect(scope.stickyVal).toBe('user1');
 
   });
+
+  // nasty hackery to spy on the select 2 jquery function
+  describe('jquery fn config', function(){
+
+    var select2options;
+    var origSelect2 = $.fn.select2;
+
+
+    beforeEach(function(){
+
+      spyOn($.fn, 'select2').and.callThrough();
+
+      // replace overloaded things
+      $.fn.select2.defaults = origSelect2.defaults;
+      $.fn.select2.ajaxDefaults = origSelect2.ajaxDefaults;
+
+      var element = angular.element('<input type="hidden" dcm-select2="options" ng-model="selectedVal" data="minimalData"/>');
+
+      compile(element)(scope);
+
+      scope.$digest();
+
+      select2options = element.eq(0).select2.calls.first().args[0];
+
+    });
+
+
+    afterEach(function(){
+      $.fn.select2 = origSelect2;
+    });
+
+
+    it('should have a query function that can filter data' , function(){
+
+      var result;
+
+      var opts = {
+        term: 'Doe',
+        callback: function(data) {
+          result = data;
+        }
+      };
+
+      select2options.query(opts);
+      scope.$digest();
+
+      expect(result).toEqual({
+        more: false,
+        results: [
+          { id : 'user1', text : 'Jane Doe', locked : false, children : [  ] },
+          { id : 'user2', text : 'John Doe', locked : true, children : [  ] }
+        ]
+      });
+
+    });
+
+
+    it('should handle matches in opt groups' , function(){
+
+      scope.minimalData = [
+        { id: 'user0', text: 'Disabled User'},
+        { id: 'user1', text: 'Jane Doe', og: 11, children: [
+          { id: 'user4', text: 'c3', og: 11},
+          { id: 'user5', text: 'j4-matchme', og: 11},
+        ]},
+        { id: 'user2', text: 'John Doe', og: 22, children: [
+          { id: 'user6', text: 'f5', og: 22},
+          { id: 'user7', text: 'ns-matchme', og: 22},
+        ]}
+      ];
+
+      var result;
+      var opts = {
+        term: 'matchme',
+        callback: function(data) {
+          result = data;
+        }
+      };
+
+      select2options.query(opts);
+      scope.$digest();
+
+      expect(result).toEqual({
+        more : false,
+        results : [
+          {
+            id : 'user1',
+            text : 'Jane Doe',
+            og : 11,
+            children : [ { id : 'user5', text : 'j4-matchme', og : 11 } ]
+          },
+          {
+            id : 'user2',
+            text : 'John Doe',
+            og : 22,
+            children : [ { id : 'user7', text : 'ns-matchme', og : 22 } ]
+          }
+        ]
+      });
+
+    });
+
+
+    it('should have a query function that can handle no data' , function(){
+      delete scope.minimalData;
+
+      var result;
+
+      var opts = {
+        term: '',
+        callback: function(data) {
+          result = data;
+        }
+      };
+
+      select2options.query(opts);
+      scope.$digest();
+
+      expect(result).toEqual({more: false, results: []});
+
+    });
+
+
+  });
+
+
 
 });

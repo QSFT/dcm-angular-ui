@@ -21,6 +21,7 @@
           class="input-large"
           id-field="uuid"
           text-field="name"
+          icon-field="icon"
         >
 
         <div>Selected: {{selected.name}} - {{selectedId}}</div>
@@ -37,8 +38,8 @@
             {name: 'James Andersen', age: 41, uuid: 'ad6d4f60-27dd-41a4-bc58-4b66eb8cc2f7'},
             {name: 'Albertine Roquefort', age: 19, uuid: 'a3483f04-6d88-4cab-94e8-f37d47140112'},
             {name: 'Harry Elfsport', age: 52, uuid: '752501b5-8c9c-4bf8-8dbf-549d247c54de'},
-            {name: 'Mojune Starkadder', age: 27, uuid: 'ed788226-7fd5-4c64-8065-63e88b5414df'},
-            {name: 'Julia Hazeldene', age: 84, uuid: 'da428eb5-3b7d-4c21-8b04-b0deaf54c4a0'}
+            {icon: 'fa fa-android', name: 'Mojune Starkadder', age: 27, uuid: 'ed788226-7fd5-4c64-8065-63e88b5414df'},
+            {icon: 'fa fa-android', name: 'Julia Hazeldene', age: 84, uuid: 'da428eb5-3b7d-4c21-8b04-b0deaf54c4a0'}
           ];
 
         }]);
@@ -71,6 +72,9 @@ angular.module('dcm-ui.select2', []);
       selected-opt-group="(optional) binding for the currently selected opt group text"
       opt-group-id-field="(optional, defaults to id) id field that uniquely identifies the opt group"
       class="input-large"
+      icon-field="(optional, defaults to icon) field containing class to add to icon for an item"
+      id-field="(optional, defaults to id) field containing id for an item"
+      text-field="(optional, defaults to text) field containing text for an item"
     >
   ```
  */
@@ -95,6 +99,7 @@ angular.module('dcm-ui.select2')
 
           var idField = attrs.idField || 'id';
           var textField = attrs.textField || 'text';
+          var iconField = attrs.iconField || 'icon';
 
           var modelObjectSetter = (attrs.modelSelected) ? $parse(attrs.modelSelected).assign : angular.noop;
 
@@ -318,11 +323,19 @@ angular.module('dcm-ui.select2')
             formatResult: function(result, container, query, escapeMarkup) {
               var markup=[];
               window.Select2.util.markMatch(result[textField], query.term, markup, escapeMarkup);
-              return markup.join('');
+              var text = markup.join('');
+              if (result[iconField]) {
+                text = '<i class="select2-inline-icon ' + result[iconField] + '"></i> ' + text;
+              }
+              return text;
             },
 
             formatSelection: function (data, container, escapeMarkup) {
-              return escapeMarkup(data[textField]);
+              var text = escapeMarkup(data[textField]);
+              if (data[iconField]) {
+                text = '<i class="select2-inline-icon ' + data[iconField] + '"></i> ' + text;
+              }
+              return text;
             },
 
             id: function(obj) {

@@ -22,6 +22,9 @@
       selected-opt-group="(optional) binding for the currently selected opt group text"
       opt-group-id-field="(optional, defaults to id) id field that uniquely identifies the opt group"
       class="input-large"
+      icon-field="(optional, defaults to icon) field containing class to add to icon for an item"
+      id-field="(optional, defaults to id) field containing id for an item"
+      text-field="(optional, defaults to text) field containing text for an item"
     >
   ```
  */
@@ -46,6 +49,7 @@ angular.module('dcm-ui.select2')
 
           var idField = attrs.idField || 'id';
           var textField = attrs.textField || 'text';
+          var iconField = attrs.iconField || 'icon';
 
           var modelObjectSetter = (attrs.modelSelected) ? $parse(attrs.modelSelected).assign : angular.noop;
 
@@ -269,11 +273,19 @@ angular.module('dcm-ui.select2')
             formatResult: function(result, container, query, escapeMarkup) {
               var markup=[];
               window.Select2.util.markMatch(result[textField], query.term, markup, escapeMarkup);
-              return markup.join('');
+              var text = markup.join('');
+              if (result[iconField]) {
+                text = '<i class="select2-inline-icon ' + result[iconField] + '"></i> ' + text;
+              }
+              return text;
             },
 
             formatSelection: function (data, container, escapeMarkup) {
-              return escapeMarkup(data[textField]);
+              var text = escapeMarkup(data[textField]);
+              if (data[iconField]) {
+                text = '<i class="select2-inline-icon ' + data[iconField] + '"></i> ' + text;
+              }
+              return text;
             },
 
             id: function(obj) {

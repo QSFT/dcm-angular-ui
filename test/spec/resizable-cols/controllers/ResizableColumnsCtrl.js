@@ -65,7 +65,7 @@ describe('Controller: ResizableColumnsCtrl', function () {
 
   it('should trigger the resizeAll function once each time a set of cols are added', function() {
 
-    spyOn(ctrl,'resizeAll').andCallThrough();
+    spyOn(ctrl,'resizeAll').and.callThrough();
 
     angular.forEach(aCols, function(col){
       ctrl.addCol(col, angular.element(dragHandleTemplate));
@@ -73,7 +73,7 @@ describe('Controller: ResizableColumnsCtrl', function () {
 
     $timeout.flush();
 
-    expect(ctrl.resizeAll.calls.length).toBe(1);
+    expect(ctrl.resizeAll.calls.count()).toBe(1);
 
   });
 
