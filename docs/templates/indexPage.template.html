@@ -88,7 +88,7 @@
               icon: 'home',
               href: '#/'
             }
-            {% for name, module in doc.modules.obj %}
+            {% for module in doc.dcmModules %}
             ,
             {
               label: '{$ module.module $}',

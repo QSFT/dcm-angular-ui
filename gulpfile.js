@@ -37,7 +37,7 @@ var createDocPackage = function(component) {
     var newDocs = new Dgeni.Package(component + '-docs', [require('./docs/dgeni-conf')])
       .config(function(log, readFilesProcessor, writeFilesProcessor) {
         // Set logging level
-        log.level = 'info';
+        log.level = 'warn';
         readFilesProcessor.basePath = path.resolve(__dirname, '.');
         readFilesProcessor.sourceFiles = [
           {
@@ -68,7 +68,7 @@ gulp.task('docs-main', [], function() {
     var newDocs = new Dgeni.Package('toplevel-docs', [require('./docs/dgeni-toplev-conf')])
       .config(function(log, readFilesProcessor, writeFilesProcessor) {
         // Set logging level
-        log.level = 'debug';
+        log.level = 'warn';
         readFilesProcessor.basePath = path.resolve(__dirname, '.');
         readFilesProcessor.sourceFiles = [
           {
