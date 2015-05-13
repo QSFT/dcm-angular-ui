@@ -55,9 +55,9 @@ describe('Service: filters', function () {
     filter.filterFunctions.push(function() {return false;});
     filter.filterFunctions.push(function() {return true;});
 
-    spyOn(filter.filterFunctions,'0').andCallThrough();
-    spyOn(filter.filterFunctions,'1').andCallThrough();
-    spyOn(filter.filterFunctions,'2').andCallThrough();
+    spyOn(filter.filterFunctions,'0').and.callThrough();
+    spyOn(filter.filterFunctions,'1').and.callThrough();
+    spyOn(filter.filterFunctions,'2').and.callThrough();
 
     // this will fail
     expect( filter.filterFunction({name: 'macgyver'}) ).toBe(false);

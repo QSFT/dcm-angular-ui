@@ -327,7 +327,7 @@ describe('Directive: dcmGrid,', function () {
       rowElement.find('td').eq(4).find('i').trigger('click');
       expect(rowElement.hasClass('selected')).toEqual(true);
       rowElement.find('td').eq(4).find('i').trigger('click');
-      expect(rowElement.hasClass('selected')).toNotEqual(true);
+      expect(rowElement.hasClass('selected')).not.toEqual(true);
 
     });
 

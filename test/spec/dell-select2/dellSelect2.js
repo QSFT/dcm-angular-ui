@@ -7,6 +7,30 @@ describe('Directive: dcmSelect2', function () {
 
   var scope, compile, host;
 
+  // This is the equivalent of the old waitsFor syntax
+  // which was removed from Jasmine 2
+  var waitsFor = function(escapeFunction, escapeTime) {
+    // check the escapeFunction every millisecond so as soon as it is met we can escape the function
+    var interval = setInterval(function() {
+      if (escapeFunction()) {
+        clearMe();
+      }
+    }, 1);
+
+    // in case we never reach the escapeFunction, we will time out
+    // at the escapeTime
+    var timeOut = setTimeout(function() {
+      clearMe();
+    }, escapeTime);
+
+    // clear the interval and the timeout
+    function clearMe(){
+      clearInterval(interval);
+      clearTimeout(timeOut);
+    }
+  };
+
+
   beforeEach(inject(function ($rootScope, $compile) {
     scope = $rootScope.$new();
     compile = $compile;
@@ -623,7 +647,7 @@ describe('Directive: dcmSelect2', function () {
 
     beforeEach(function(){
 
-      spyOn($.fn, 'select2').andCallThrough();
+      spyOn($.fn, 'select2').and.callThrough();
 
       // replace overloaded things
       $.fn.select2.defaults = origSelect2.defaults;
@@ -635,7 +659,7 @@ describe('Directive: dcmSelect2', function () {
 
       scope.$digest();
 
-      select2options = element.eq(0).select2.calls[0].args[0];
+      select2options = element.eq(0).select2.calls.first().args[0];
 
     });
 

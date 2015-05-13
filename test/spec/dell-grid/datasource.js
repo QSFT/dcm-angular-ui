@@ -13,7 +13,7 @@ describe('Service: datasource', function () {
 
     module(function($provide) {
       $provide.decorator('$http', function($delegate){
-        var o = jasmine.createSpy().andCallFake($delegate);
+        var o = jasmine.createSpy().and.callFake($delegate);
         return o;
       });
     });
@@ -88,7 +88,7 @@ describe('Service: datasource', function () {
       request: { url: '/simple' }
     };
 
-    spyOn(_, 'debounce').andCallFake(function(x) {
+    spyOn(_, 'debounce').and.callFake(function(x) {
       return x;
     });
 
@@ -594,7 +594,7 @@ describe('Service: datasource', function () {
     expect(scope.ds.data).toEqual(sampleData);
 
     // check two requests madce
-    expect($http.calls.length).toBe(2);
+    expect($http.calls.count()).toBe(2);
 
     // check data was only updated once
     expect(updateCount).toBe(1);
@@ -630,7 +630,7 @@ describe('Service: datasource', function () {
     expect(scope.ds.data).toEqual(sampleData);
 
     // check only one request was made
-    expect($http.calls.length).toBe(1);
+    expect($http.calls.count()).toBe(1);
 
     // check data was only updated once
     expect(updateCount).toBe(1);
