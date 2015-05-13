@@ -1835,15 +1835,28 @@ angular.module('dcm-ui.grid')
             };
 
 
-            var index, length, rowData, id, record, position, oldPosition;
+            var id, record, position, oldPosition;
 
             var aNewRecords = [];
             var oNewRecordId = {};
 
-            // we are not using forEach for perf reasons (trying to avoid #call)
-            for (index = 0, length = aData.length; index < length; index++) {
 
-              rowData = aData[index];
+
+            var watchRow = function(item, key){
+              var scope = this;
+              scope[key] = item;
+              scope.$watch('$$gridData.' + key, function(newVal){
+                if (newVal !== scope[key]) {
+                  scope[key] = newVal;
+                }
+              });
+            };
+
+
+            // we are not using forEach for perf reasons (trying to avoid #call)
+            for (var index = 0, length = aData.length; index < length; index++) {
+
+              var rowData = aData[index];
 
               id = ctrl.getGridDataID(rowData);
 
@@ -1857,8 +1870,10 @@ angular.module('dcm-ui.grid')
                 var thisRow = rowData;
                 var thisRecord = {};
 
-                // copy the data into the new scope so it can be accessed directly
-                angular.extend(newScope, rowData);
+                newScope.$$gridData = aData[index];
+
+                // setup watchers for the data in each row
+                angular.forEach(rowData, watchRow, newScope);
 
                 //copy in the additional row data
                 if (ctrl.additionalRowData) {
@@ -1942,20 +1957,9 @@ angular.module('dcm-ui.grid')
                   record.checkbox = record.row.find('td.dcm-grid-selectable i');
 
                   if (index === 0) {
-                    // if we want to insert into the first position and there is already data in the table
-                    // we need to workaround $animate.enter not being able to insert into position 0
-                    if (aRecords.length) {
-
-                      $animate.enter(record.row, tableBody, aRecords[0].row);
-                      $animate.move(aRecords[0].row, tableBody, record.row);
-
-                    } else {
-                      $animate.enter(record.row, tableBody, null);
-                    }
+                    $animate.enter(record.row, tableBody, null);
                   } else {
-
                     $animate.enter(record.row, tableBody, aRecords[index - 1].row);
-
                   }
 
                   // add into aRecords
@@ -1970,22 +1974,12 @@ angular.module('dcm-ui.grid')
 
                 } else {
 
-                  // this is an item already visibible, we need to move it if it's not in the correct position
-
-                  // if we want to move into the first position
-                  // we need to workaround $animate.move not being able to move into position 0
+                  // this is an item already visible, we need to move it if it's not in the correct position
                   if (index === 0) {
-
-                    $animate.move(record.row, tableBody, aRecords[0].row);
-                    $animate.move(aRecords[0].row, tableBody, record.row);
-
+                    $animate.move(record.row, tableBody, null);
                   } else {
-
                     $animate.move(record.row, tableBody, aRecords[index - 1].row);
-
                   }
-
-
 
                   oldPosition = oVisibleRecordId[record.id];
 
@@ -2007,40 +2001,6 @@ angular.module('dcm-ui.grid')
             }
 
 
-            // validate the data ... (for debugging)
-            //
-            // var bFail = false
-
-            // angular.forEach(oVisibleRecordId, function(obj, key){
-            //   var record = aRecords[obj];
-            //   if (!aRecords.hasOwnProperty(obj)) {
-            //     bFail = true;
-            //     console.log('check of oVisibleRecordId failed!!! - ' + key + ' -> missing in aRecords');
-            //   } else if (key !== record.id) {
-            //     bFail = true;
-            //     console.log('check of oVisibleRecordId failed!!! - ' + key + ' -> ' + record.id);
-            //   }
-
-            // });
-
-            // angular.forEach(aRecords, function(obj, idx){
-
-            //   var recordedIndex = oVisibleRecordId[obj.id];
-
-            //   if (!oVisibleRecordId.hasOwnProperty(obj.id)) {
-            //     bFail = true;
-            //     console.log('check of aRecords failed!!! - ' + obj.id + ' -> missing in oVisibleRecordId');
-            //   } else if (recordedIndex !== idx) {
-            //     bFail = true;
-            //     console.log('check of aRecords failed!!! - ' + obj.id + ' -> ' + recordedIndex);
-            //   }
-            // });
-
-            // if (bFail) {
-            //   console.log('=== audit done ===')
-            //   console.log(aNewRecords);
-            //   console.log(oVisibleRecordId)
-            // }
 
             // restore the active row if there was one before new data arrived
             if (restoreActiveRow) {
