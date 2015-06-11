@@ -126,6 +126,24 @@ angular.module('dcm-ui.grid')
 
         };
 
+        filter.addFilterExactMatchArray = function(idField, aFields) {
+          filter.filterFunctions.push(
+            function(oFilterData, oRowData) {
+              if (oFilterData[idField] && oFilterData[idField] !== '') {
+                var matched = false;
+                _.each(aFields, function(fld) {
+                  if ( oFilterData[idField].toString() === oRowData[fld].toString() ) {
+                    matched = true;
+                  }
+                });
+                return matched;
+              }
+              return true;
+            }
+
+          );
+        };
+
 
         filter.addFilterInteger = function(idField, compareType) {
 
