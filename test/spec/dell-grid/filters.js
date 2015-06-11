@@ -86,6 +86,36 @@ describe('Service: filters', function () {
 
   });
 
+  it('should be able to do an exact match', function() {
+    scope.filter.addFilterExactMatch('name');
+
+    filter.values.name = '';
+    expect(filter.values.name).toBe('');
+    expect( filter.filterFunction({name: 'macgyver'}) ).toBe(true);
+
+    filter.values.name = 'mac';
+    expect( filter.filterFunction({name: 'macgyver'}) ).toBe(false);
+
+    filter.values.name = 'macgyver';
+    expect( filter.filterFunction({name: 'macgyver'}) ).toBe(true);
+
+  });
+
+  it('should be able to do an exact match against multiple attributes', function() {
+    scope.filter.addFilterExactMatch('name',['name','nickname']);
+
+    filter.values.name = '';
+    expect(filter.values.name).toBe('');
+    expect( filter.filterFunction({name: 'macgyver',nickname: 'mac'}) ).toBe(true);
+
+    filter.values.name = 'guy';
+    expect( filter.filterFunction({name: 'macgyver',nickname: 'mac'}) ).toBe(false);
+
+    filter.values.name = 'mac';
+    expect( filter.filterFunction({name: 'macgyver',nickname: 'mac'}) ).toBe(true);
+
+  });
+
   it('should be able to add an integer filter - gt', function () {
 
     scope.filter.addFilterInteger('someId', 'gt');
