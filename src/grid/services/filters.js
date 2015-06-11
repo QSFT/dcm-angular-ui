@@ -92,14 +92,25 @@ angular.module('dcm-ui.grid')
 
 
 
-        filter.addFilterExactMatch = function(idField) {
+        filter.addFilterExactMatch = function(idField, aFields) {
 
           filter.filterFunctions.push(
             function(oFilterData, oRowData) {
+
+              if ( aFields && aFields.length && !angular.isArray(aFields) ) {
+                aFields = [aFields.toString()];
+              } else if ( !aFields ) {
+                aFields = [idField];
+              }
+
               if (oFilterData[idField] !== '') {
-                if (oFilterData[idField].toString() !== oRowData[idField].toString()) {
-                  return false;
-                }
+                var matched = false;
+                _.each(aFields, function(fld) {
+                  if (oFilterData[idField].toString() === oRowData[fld].toString()) {
+                    matched = true;
+                  }
+                });
+                return matched;
               }
               return true;
             }
@@ -124,24 +135,6 @@ angular.module('dcm-ui.grid')
 
           );
 
-        };
-
-        filter.addFilterExactMatchArray = function(idField, aFields) {
-          filter.filterFunctions.push(
-            function(oFilterData, oRowData) {
-              if (oFilterData[idField] && oFilterData[idField] !== '') {
-                var matched = false;
-                _.each(aFields, function(fld) {
-                  if ( oFilterData[idField].toString() === oRowData[fld].toString() ) {
-                    matched = true;
-                  }
-                });
-                return matched;
-              }
-              return true;
-            }
-
-          );
         };
 
 
