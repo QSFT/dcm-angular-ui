@@ -27,6 +27,18 @@ angular.module('dcm-ui.grid')
       }
     };
 
+    var makeArray = function(val, defaultVal) {
+      var aValue = [];
+      if ( angular.isArray(val) ) {
+        aValue = val;
+      } else if ( val && val.length ) {
+        aValue.push( val.toString() );
+      } else {
+        aValue.push( defaultVal );
+      }
+      return aValue;
+    };
+
 
 
     // var isValid = function(val) {
@@ -97,20 +109,15 @@ angular.module('dcm-ui.grid')
           filter.filterFunctions.push(
             function(oFilterData, oRowData) {
 
-              if ( aFields && aFields.length && !angular.isArray(aFields) ) {
-                aFields = [aFields.toString()];
-              } else if ( !aFields ) {
-                aFields = [idField];
-              }
+              aFields = makeArray(aFields, idField);
 
               if (oFilterData[idField] !== '') {
-                var matched = false;
-                _.each(aFields, function(fld) {
-                  if (oFilterData[idField].toString() === oRowData[fld].toString()) {
-                    matched = true;
+                for (var i=0; i<aFields.length; i++) {
+                  if (oFilterData[idField].toString() === oRowData[aFields[i]].toString()) {
+                    return true;
                   }
-                });
-                return matched;
+                }
+                return false;
               }
               return true;
             }
@@ -171,11 +178,12 @@ angular.module('dcm-ui.grid')
 
         };
 
-        filter.addFilterPartialMatch = function(idField, interpolationString) {
+        filter.addFilterPartialMatch = function(idField, interpolationString, aFields) {
           var interpolate, strSearch;
           if (interpolationString) {
             interpolate = $interpolate(interpolationString);
           }
+          aFields = makeArray(aFields, idField);
           filter.filterFunctions.push(
             function(oFilterData, oRowData) {
               if (oFilterData[idField] !== '') {
@@ -184,20 +192,24 @@ angular.module('dcm-ui.grid')
                 } else {
                   strSearch = oRowData[idField];
                 }
-                if (!strSearch || strSearch.toLowerCase().indexOf(oFilterData[idField].toLowerCase()) === -1) {
-                  return false;
+                for (var i=0; i<aFields.length; i++) {
+                  if (strSearch && strSearch.toLowerCase().indexOf(oFilterData[aFields[i]].toLowerCase()) !== -1) {
+                    return true;
+                  }
                 }
+                return false;
               }
               return true;
             }
           );
         };
 
-        filter.addFilterExactPartialMatch = function(idField, interpolationString) {
+        filter.addFilterExactPartialMatch = function(idField, interpolationString, aFields) {
           var interpolate, strSearch;
           if (interpolationString) {
             interpolate = $interpolate(interpolationString);
           }
+          aFields = makeArray(aFields, idField);
           filter.filterFunctions.push(
             function(oFilterData, oRowData) {
               if (oFilterData[idField] !== '') {
@@ -206,9 +218,12 @@ angular.module('dcm-ui.grid')
                 } else {
                   strSearch = oRowData[idField];
                 }
-                if (strSearch.toLowerCase().indexOf(oFilterData[idField].toLowerCase()) !== 0) {
-                  return false;
+                for (var i=0; i<aFields.length; i++) {
+                  if (strSearch && strSearch.toLowerCase().indexOf(oFilterData[aFields[i]].toLowerCase()) === 0) {
+                    return true;
+                  }
                 }
+                return false;
               }
               return true;
             }
@@ -249,14 +264,14 @@ angular.module('dcm-ui.grid')
           return bDisplay;
         };
 
-        filter.addStandardTextSearchFilter = function(field, interpolationString) {
+        filter.addStandardTextSearchFilter = function(field, interpolationString, aFields) {
           filter.addDefaultValue(field, '');
-          filter.addFilterPartialMatch(field, interpolationString);
+          filter.addFilterPartialMatch(field, interpolationString, aFields);
         };
 
-        filter.addExactPartialTextSearchFilter = function(field, interpolationString) {
+        filter.addExactPartialTextSearchFilter = function(field, interpolationString, aFields) {
           filter.addDefaultValue(field, '');
-          filter.addFilterExactPartialMatch(field, interpolationString);
+          filter.addFilterExactPartialMatch(field, interpolationString, aFields);
         };
 
         return filter;
