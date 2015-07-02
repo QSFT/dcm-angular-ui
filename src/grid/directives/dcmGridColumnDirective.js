@@ -50,7 +50,7 @@ angular.module('dcm-ui.grid')
           // copy over any attributes that aren't in our scope
           var attributes = {};
           angular.forEach(attrs, function(obj, key){
-            if (key[0] !== '$' && !scope.hasOwnProperty(key) && attrs[key] !== '') {
+            if (key[0] !== '$' && ( !scope.hasOwnProperty(key) || scope[key] === undefined ) && obj !== '') {
               attributes[key.replace(/([A-Z])/g,'-$1').toLowerCase()] = obj;
             }
           });
@@ -58,13 +58,13 @@ angular.module('dcm-ui.grid')
           var col = {
             content: content,
             attributes: attributes,
-            enabled: attrs.hasOwnProperty('enabled') ? (scope.enabled.toLowerCase() !== 'false') : true,
+            enabled: attrs.enabled !== undefined ? (attrs.enabled.toLowerCase() !== 'false') : true,
             title: scope.title,
             width: scope.width,
-            resizable: attrs.hasOwnProperty('resizable') ? (scope.resizable.toLowerCase() !== 'false') : true,
+            resizable: attrs.resizable !== undefined ? (attrs.resizable.toLowerCase() !== 'false') : true,
             field: attrs.field,
             sortType: scope.sortType || '',
-            sortDefault: attrs.hasOwnProperty('sortDefault') ? attrs.sortDefault || 'ASC' : false
+            sortDefault: attrs.sortDefault !== undefined ? attrs.sortDefault || 'ASC' : false
           };
 
           // if no field is specified try and infer it from the content
