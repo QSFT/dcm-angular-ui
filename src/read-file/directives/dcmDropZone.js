@@ -13,8 +13,8 @@
  */
 
 angular.module('dcm-ui.read-file')
-.directive( 'dcmDropZone', [
-  function( ) {
+.directive( 'dcmDropZone', [ '$timeout',
+  function( $timeout ) {
     return {
       restrict: 'A',
       scope: {
@@ -27,31 +27,32 @@ angular.module('dcm-ui.read-file')
 
         element.on('dragstart dragenter dragover', function(event) {
 
-          // Only file drag-n-drops allowed, http://jsfiddle.net/guYWx/16/
-
+          // Only file drag-n-drops allowed
           if (_.findWhere(event.originalEvent.dataTransfer.types, 'Files')) {
 
             event.stopPropagation();
             event.preventDefault();
 
-            clearTimeout(dropZoneTimer);
+            $timeout.cancel(dropZoneTimer);
 
             if (!dropHovered) {
               dropHovered = true;
               element.addClass('drop-zone-hover');
             }
 
-            event.originalEvent.dataTransfer.effectAllowed= 'copyMove';
-            event.originalEvent.dataTransfer.dropEffect= 'move';
+            // set cursor icons
+            event.originalEvent.dataTransfer.effectAllowed = 'copyMove';
+            event.originalEvent.dataTransfer.dropEffect = 'move';
 
           }
 
         })
         .on('drop dragleave dragend', function () {
 
-          clearTimeout(dropZoneTimer);
-          dropZoneTimer = setTimeout( function(){
-            dropHovered= false;
+          $timeout.cancel(dropZoneTimer);
+
+          dropZoneTimer = $timeout( function(){
+            dropHovered = false;
             element.removeClass('drop-zone-hover');
           }, 70); // dropZoneHideDelay = 70, but anything above 50 is better
 
@@ -63,8 +64,6 @@ angular.module('dcm-ui.read-file')
           evt.preventDefault();
           scope.dcmDropZone(evt.originalEvent);
         });
-
-
 
       }
     };

@@ -20,6 +20,7 @@
   "smarttabs": true,
   "globals": {
     "$": false,
+    "_": false,
     "after": false,
     "afterEach": false,
     "angular": false,

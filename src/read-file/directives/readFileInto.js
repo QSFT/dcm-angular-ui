@@ -62,9 +62,9 @@ angular.module('dcm-ui.read-file')
 
             if (scope.format === 'auto') {
               switch (getExtension(file.name)) {
-              case 'yaml':
               case 'txt':
               case 'text':
+              case 'yaml':
                 return 'text';
 
               default:
