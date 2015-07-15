@@ -85,14 +85,14 @@ angular.module('dcm-ui.multiple-input')
       }
 
       // if no input type is specified default it to text
-      if (tAttrs.addButtonLabel === undefined || !tAttrs.hasOwnProperty('addButtonLabel')) {
+      if (tAttrs.addButtonLabel === undefined) {
         tAttrs.$set('addButtonLabel', 'Add Item');
       }
 
 
       // remove optional attributes of not specified
       angular.forEach(['ngPattern', 'ngMinlength', 'ngMaxlength', 'placeholder'], function(attr){
-        if (!tAttrs.hasOwnProperty(attr) || tAttrs[attr] === undefined) {
+        if (tAttrs[attr] === undefined) {
           inputEl.removeAttr(attr.replace(/([A-Z])/g,'-$1').toLowerCase());
         }
       });

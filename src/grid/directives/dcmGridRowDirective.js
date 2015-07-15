@@ -29,7 +29,7 @@ angular.module('dcm-ui.grid')
           // copy over any attributes that aren't in our scope
           var attributes = {};
           angular.forEach(attrs, function(obj, key){
-            if (key[0] !== '$' && ( !scope.hasOwnProperty(key) || scope[key] === undefined ) && obj !== '') {
+            if (key[0] !== '$' && scope[key] === undefined && obj !== '') {
               attributes[key.replace(/([A-Z])/g,'-$1').toLowerCase()] = obj;
             }
           });
