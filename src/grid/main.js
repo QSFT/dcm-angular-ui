@@ -295,7 +295,7 @@
             $scope.filter = filters.new($scope);
 
             // add filter for service tag
-            $scope.filter.addExactPartialTextSearchFilter('serviceTag');
+            $scope.filter.addStandardTextSearchFilter('serviceTag');
 
             // add filter for 'online status'
             $scope.filter.addDefaultValue('isOnline', false);

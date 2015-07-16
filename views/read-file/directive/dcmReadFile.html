@@ -1,0 +1,50 @@
+
+
+
+<header>
+  <h1>dcmReadFile</h1>
+  <ul class="list-clear">
+    
+    <li>- directive in module <a href="#/api/read-file">dcm-ui.read-file</a></li>
+  </ul>
+</header>
+
+
+
+<div class="api-profile-description">
+  <p>When the file selected by a file input control changes read the file contents are read into
+the scope variable that is specified.
+The file is read as a data uri, file or text. A base64 encoded string prefixed with &#39;data:[mime type],&#39;.</p>
+
+</div>
+
+
+
+
+<div>
+  
+
+  
+  <h2>Directive Info</h2>
+  <ul>
+    
+    <li>This directive executes at priority level 0.</li>
+  </ul>
+
+  
+  <h2 id="usage">Usage</h2>
+  <div class="usage">
+  
+    <INPUT TYPE='file' dcm-read-file format="file|uri|text" ngModel="account.fileData>
+  OR
+<INPUT TYPE='file' dcm-read-file="some.var" format="file|uri|text" ngModel="account.fileData>
+  
+  </div>
+  
+  
+
+
+  
+</div>
+
+

@@ -1,0 +1,143 @@
+
+/**
+ * @ngdoc module
+ * @name dcm-ui.read-file
+ * @description
+ *
+ * The `dcm-ui.read-file` module allows you to use the HTML fileReader to load a file
+ *
+ * @example
+   <example name="read-file-demo" module="dcm-ui.read-file">
+
+    <file name="script.js">
+      angular.module('dcm-ui.read-file')
+        .run(['$rootScope',
+          function($rootScope) {
+
+            $rootScope.data = {
+              singleFile: undefined,
+              singleFileContent: '',
+              multiFile: [],
+              multiFileContent: []
+            };
+
+        }])
+      ;
+    </file>
+
+    <file name="index.html">
+      <form class="form">
+
+        <div class="form-group" dcm-drop-zone="singleUploadHandler">
+
+          <div class="drop-zone-message">
+            <h3>Drop a single file here</h3>
+          </div>
+
+          <label for="exampleInput1">Load File</label>
+          <input
+            type="file"
+            dcm-read-file="data.singleFile"
+            ng-model="data.singleFileContent"
+            id="exampleInput1"
+            class="form-control"
+            format="auto"
+            drop-handler="singleUploadHandler"
+          >
+        </div>
+
+        <div class="form-group" dcm-drop-zone="multiUploadHandler">
+
+          <div class="drop-zone-message">
+            <h3>Drop file(s) here</h3>
+          </div>
+
+          <label for="exampleInput2">Load Multiple Files</label>
+          <input
+            type="file"
+            multiple
+            dcm-read-file="data.multiFile"
+            ng-model="data.multiFileContent"
+            id="exampleInput2"
+            class="form-control"
+            drop-handler="multiUploadHandler"
+          >
+        </div>
+
+
+      </form>
+
+      <div class="panel panel-default">
+        <div class="panel-heading">
+          <h3 class="panel-title">Single File Content</h3>
+        </div>
+        <div class="panel-body">
+          {{data.singleFileContent}}
+        </div>
+      </div>
+
+      <div class="panel panel-default">
+        <div class="panel-heading">
+          <h3 class="panel-title">Multiple Files</h3>
+        </div>
+        <div class="panel-body">
+
+          <div class="file" ng-repeat="file in data.multiFile">
+
+            <h4>{{ file.name }}</h4>
+            <dl class="dl-horizontal">
+              <dt ng-repeat-start="(key, val) in file">{{key}}</dt>
+              <dd ng-repeat-end>{{val}}</dd>
+            </dl>
+
+          </div>
+
+        </div>
+      </div>
+
+    </file>
+
+    <file name="style.css">
+
+      dd {
+        text-overflow: ellipsis;
+        overflow: hidden;
+        width: 440px;
+      }
+
+      .form-group {
+        margin: 15px 5px;
+      }
+
+      .drop-zone-message {
+        display: none;
+      }
+
+      .drop-zone-message h3 {
+        position: absolute;
+        top: 25%;
+        margin: 0;
+        width: 100%;
+      }
+
+      .drop-zone-hover {
+        outline: 1px dashed grey;
+        position: relative;
+      }
+
+      .drop-zone-hover .drop-zone-message {
+        display: block;
+        position: absolute;
+        z-index: 100;
+        background: #ffffff;
+        width: 100%;
+        height: 100%;
+        text-align: center;
+      }
+
+    </file>
+
+  </example>
+ */
+'use strict';
+angular.module('dcm-ui.read-file',[]);
