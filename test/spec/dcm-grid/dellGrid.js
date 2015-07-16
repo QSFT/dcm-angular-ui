@@ -763,6 +763,27 @@ describe('Directive: dcmGrid,', function () {
 
   });
 
+
+  it('should support sorting on nested properties', function(){
+
+    var element = angular.element(
+      '<dcm-grid datasource="testData" sort-function="sorter" sort-order="sortOrder">' +
+        '<dcm-grid-column title="Name" width="15%" sort-default>{{test.name}}</dcm-grid-column>' +
+      '</dcm-grid>'
+    );
+
+    compile(element)(scope);
+    scope.$digest();
+
+
+    expect(scope.sorter({test: { name:'Blob'} })).toBe('blob');
+
+    // should handle a missing key/value in nested data
+    expect(scope.sorter({test: {} })).toBe('');
+
+  });
+
+
   it('should be able to provide a default sort order using the sort-default attribute', function(){
 
     var element = angular.element(

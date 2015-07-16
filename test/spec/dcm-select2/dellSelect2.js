@@ -5,7 +5,7 @@ describe('Directive: dcmSelect2', function () {
   // load the directive's module
   beforeEach(module('dcm-ui.select2'));
 
-  var scope, compile, host;
+  var scope, compile, host, SELECT2;
 
   // This is the equivalent of the old waitsFor syntax
   // which was removed from Jasmine 2
@@ -30,10 +30,25 @@ describe('Directive: dcmSelect2', function () {
     }
   };
 
+  var waitForOpen = function(element) {
 
-  beforeEach(inject(function ($rootScope, $compile) {
+    // open the results dropdown (and wait until it has opened)
+    var bComplete = false;
+    element.one('select2-open', function(){
+      bComplete = true;
+    });
+    element.select2('open');
+    scope.$digest();
+    waitsFor(function(){ return bComplete; }, 1500);
+
+  };
+
+
+  beforeEach(inject(function ($rootScope, $compile, _SELECT2_) {
     scope = $rootScope.$new();
     compile = $compile;
+
+    SELECT2 = _SELECT2_;
 
     scope.minimalData = [
       { id: 'user0', text: 'Disabled User', locked: true, icon:'test-icon'},
@@ -69,18 +84,12 @@ describe('Directive: dcmSelect2', function () {
   var selectAsUser = function(element, index) {
 
     // open the results dropdown (and wait until it has opened)
-    var bComplete = false;
-    element.one('select2-open', function(){
-      bComplete = true;
-    });
-    element.select2('open');
-    scope.$digest();
-    waitsFor(function(){ return bComplete; }, 1500);
+    waitForOpen(element);
 
     var aResults = $('ul.select2-results li');
 
     // select the first element
-    bComplete = false;
+    var bComplete = false;
     element.on('change', function(){
       bComplete = true;
     });
@@ -146,6 +155,47 @@ describe('Directive: dcmSelect2', function () {
     // select first result and make sure icon shows in selection still
     selectAsUser(element,0);
     expect(getContainer(element).find('span.select2-chosen i').attr('class')).toBe('select2-inline-icon test-icon');
+
+  });
+
+
+
+  it('should be completely removed if the parent scope is destroyed', function () {
+
+    var element = compile('<input type="hidden" dcm-select2 ng-model="selectedVal" data="minimalData"/>')(scope);
+
+    scope.$digest();
+
+    expect(getContainer(element).is('div.select2-container')).toBe(true);
+
+    waitForOpen(element);
+
+    scope.$destroy();
+
+    expect($('.select2-drop').length).toBe(0);
+
+  });
+
+
+  it('should be closed if the SELECT2.close event is observed', function () {
+
+    var element = compile('<input type="hidden" dcm-select2 ng-model="selectedVal" data="minimalData"/>')(scope);
+    scope.$digest();
+    expect(getContainer(element).is('div.select2-container')).toBe(true);
+
+    waitForOpen(element);
+
+
+    var bComplete = false;
+    element.one('select2-close', function(){
+      bComplete = true;
+    });
+
+    scope.$broadcast(SELECT2.events.close);
+
+    waitsFor(function(){ return bComplete; }, 1500);
+
+    expect(bComplete).toBe(true);
 
   });
 
@@ -281,7 +331,7 @@ describe('Directive: dcmSelect2', function () {
   describe('multiple enabled', function(){
 
 
-    xit('should update the model if the user changes the selection when multiple is enabled', function(){
+    it('should update the model if the user changes the selection when multiple is enabled', function(){
 
       scope.selectedVal = [];
       scope.selectedObjects = [];
