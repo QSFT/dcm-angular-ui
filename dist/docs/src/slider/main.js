@@ -56,6 +56,7 @@
       .dcm-slider {
         height: 40px;
         position: relative;
+        margin: 0 20px;
       }
 
       .dcm-slider-bar-container {
