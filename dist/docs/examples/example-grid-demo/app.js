@@ -97,7 +97,7 @@ angular.module('dcm-ui.grid')
       $scope.filter = filters.new($scope);
 
       // add filter for service tag
-      $scope.filter.addStandardTextSearchFilter('serviceTag');
+      $scope.filter.addTextSearchMatchFromStartFilter('serviceTag');
 
       // add filter for 'online status'
       $scope.filter.addDefaultValue('isOnline', false);

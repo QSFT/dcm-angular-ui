@@ -302,7 +302,7 @@ Also includes a service for managing the grid datasource and filters.</p>
         $scope.filter = filters.new($scope);
 
         // add filter for service tag
-        $scope.filter.addExactPartialTextSearchFilter(&#39;serviceTag&#39;);
+        $scope.filter.addTextSearchMatchFromStartFilter(&#39;serviceTag&#39;);
 
         // add filter for &#39;online status&#39;
         $scope.filter.addDefaultValue(&#39;isOnline&#39;, false);
