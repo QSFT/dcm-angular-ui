@@ -80,8 +80,13 @@ angular.module('dcm-ui.select2', []);
  */
 
 angular.module('dcm-ui.select2')
-  .directive('dcmSelect2', ['$q', '$filter', '$parse',
-    function ($q, $filter, $parse) {
+  .constant('SELECT2', {
+    events: {
+      close: 'CLOSE_SELECT2'
+    }
+  })
+  .directive('dcmSelect2', ['$q', '$filter', '$parse', 'SELECT2',
+    function ($q, $filter, $parse, SELECT2) {
 
     return {
       restrict: 'A',
@@ -497,6 +502,13 @@ angular.module('dcm-ui.select2')
           });
 
 
+          scope.$on('$destroy',function(){
+            element.select2('destroy');
+          });
+
+          scope.$on(SELECT2.events.close,function(){
+            element.select2('close');
+          });
 
 
         };

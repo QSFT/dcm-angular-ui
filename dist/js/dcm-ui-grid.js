@@ -295,7 +295,7 @@
             $scope.filter = filters.new($scope);
 
             // add filter for service tag
-            $scope.filter.addStandardTextSearchFilter('serviceTag');
+            $scope.filter.addTextSearchMatchFromStartFilter('serviceTag');
 
             // add filter for 'online status'
             $scope.filter.addDefaultValue('isOnline', false);
@@ -1189,9 +1189,28 @@ angular.module('dcm-ui.grid')
 
             if (col.field) {
               // if this col had a sort field specified (or we could get a single field from the content...)
-              getData = function(a) {
-                return a[col.field];
-              };
+
+              if (col.field.match(/\./)) {
+                var aParts = col.field.split('.');
+                getData = function(a) {
+                  var nested = a;
+                  for (var i = 0; i < aParts.length; i++) {
+                    var key = aParts[i];
+                    if (nested.hasOwnProperty(key)) {
+                      nested = nested[key];
+                    } else {
+                      // key doesn't exist so return
+                      return;
+                    }
+                  }
+                  return nested;
+                };
+              } else {
+                getData = function(a) {
+                  return a[col.field];
+                };
+              }
+
 
             } else {
               // interpolate the content with the data
@@ -2949,6 +2968,17 @@ angular.module('dcm-ui.grid')
           filter.addFilterWithComparator(comparator, idField, interpolationStringOrAdditionalFields);
         };
 
+        filter.addFilterPartialMatchFromStart = function(idField, interpolationStringOrAdditionalFields) {
+          var comparator = function(searchString, queryString) {
+            if (searchString && searchString.toLowerCase().indexOf(queryString.toLowerCase()) === 0) {
+              return true;
+            } else {
+              return false;
+            }
+          };
+          filter.addFilterWithComparator(comparator, idField, interpolationStringOrAdditionalFields);
+        };
+
         // can only have interpolation string or additional search fields
         filter.addFilterWithComparator = function(comparator, idField, interpolationStringOrAdditionalFields) {
 
@@ -3044,6 +3074,11 @@ angular.module('dcm-ui.grid')
         filter.addExactTextSearchFilter = function(field, interpolationStringOrAdditionalFields) {
           filter.addDefaultValue(field, '');
           filter.addFilterExactMatch(field, interpolationStringOrAdditionalFields);
+        };
+
+        filter.addTextSearchMatchFromStartFilter = function(field, interpolationStringOrAdditionalFields) {
+          filter.addDefaultValue(field, '');
+          filter.addFilterPartialMatchFromStart(field, interpolationStringOrAdditionalFields);
         };
 
         return filter;
