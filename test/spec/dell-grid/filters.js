@@ -49,6 +49,72 @@ describe('Service: filters', function () {
   });
 
 
+  it('should be able to add default values', function () {
+
+    filter.addDefaultValue('blah');
+
+    expect(filter.defaultValues.blah).toBe('');
+    expect(filter.values.blah).toBe('');
+
+  });
+
+
+  it('should be able to add default params', function () {
+
+    filter.addDefaultParam('blah');
+
+    expect(filter.defaultParams.blah).toBe('');
+    expect(filter.requestParams.blah).toBe('');
+
+  });
+
+  it('should be able to watch a filter value for change then execute a function', function () {
+
+    var watchOld, watchNew;
+
+    filter.addDefaultValue('blah');
+
+    filter.values.blah = 'oldValue';
+
+    filter.onChange('values', 'blah', function(newVal, oldVal){
+      watchOld = oldVal;
+      watchNew = newVal;
+    });
+
+    scope.$digest();
+
+    filter.values.blah = 'newValue';
+    scope.$digest();
+
+    expect(watchOld).toBe('oldValue');
+    expect(watchNew).toBe('newValue');
+
+  });
+
+  it('should be able to watch a filter collection for change then execute a function', function () {
+
+    var watchOld, watchNew;
+
+    filter.addDefaultValue('blah', []);
+
+    filter.values.blah.push('oldValue');
+
+    filter.onCollectionChange('values', 'blah', function(newVal, oldVal){
+      watchOld = oldVal;
+      watchNew = newVal;
+    });
+
+    scope.$digest();
+
+    filter.values.blah.push('newValue');
+    scope.$digest();
+
+    expect(watchOld).toEqual(['oldValue']);
+    expect(watchNew).toEqual(['oldValue', 'newValue']);
+
+  });
+
+
   it('should stop filtering once the first filter fails, ', function () {
 
     filter.filterFunctions.push(function() {return true;});
@@ -86,11 +152,49 @@ describe('Service: filters', function () {
 
   });
 
+  it('should be able to add a filter that matches an interpolated string', function () {
+
+    var rowData = {lname: 'macgyver', fname: 'nancy'};
+
+    scope.filter.addStandardTextSearchFilter('name', '{{fname}} {{lname}}');
+
+
+    // no name set initially = no filtering by name
+    expect(filter.values.name).toBe('');
+    expect( filter.filterFunction(rowData)).toBe(true);
+
+    filter.values.name = 'anc mac';
+    expect( filter.filterFunction(rowData)).toBe(false);
+
+    filter.values.name = 'ancy macg';
+    expect( filter.filterFunction(rowData)).toBe(true);
+
+  });
+
+
+
   it('should be able to do an exact match', function() {
     scope.filter.addFilterExactMatch('name');
 
     filter.values.name = '';
     expect(filter.values.name).toBe('');
+    expect( filter.filterFunction({name: 'macgyver'}) ).toBe(true);
+
+    filter.values.name = 'mac';
+    expect( filter.filterFunction({name: 'macgyver'}) ).toBe(false);
+
+    filter.values.name = 'macgyver';
+    expect( filter.filterFunction({name: 'macgyver'}) ).toBe(true);
+
+  });
+
+
+  it('should be able to setup an exact match filter', function() {
+
+    scope.filter.addExactTextSearchFilter('name');
+
+    expect(filter.values.name).toBe('');
+
     expect( filter.filterFunction({name: 'macgyver'}) ).toBe(true);
 
     filter.values.name = 'mac';
@@ -136,6 +240,12 @@ describe('Service: filters', function () {
   it('should be able to add an integer filter - eq', function () {
 
     scope.filter.addFilterInteger('someId', 'eq');
+
+    filter.values.someId = '';
+
+    // should be valid before someId is set
+    expect( filter.filterFunction({someId: 3}) ).toBe(true);
+
     filter.values.someId = 5;
     expect( filter.filterFunction({someId: 5}) ).toBe(true);
     expect( filter.filterFunction({someId: 10}) ).toBe(false);
@@ -144,6 +254,10 @@ describe('Service: filters', function () {
 
   it('should filter when value is', function() {
     scope.filter.addFilterWhenValueIs('checkField', 1);
+
+    // before any value is set it should be valid
+    expect( filter.filterFunction({checkField: 1})).toBe(true);
+
     filter.values.checkField = '1';
     expect( filter.filterFunction({checkField: 1})).toBe(true);
     expect( filter.filterFunction({checkField: 0})).toBe(false);
@@ -151,84 +265,21 @@ describe('Service: filters', function () {
   });
 
 
-  xit('should be able to add a standard select2 request param filter', function () {
+  it('should be able a field vs multiple values in an object', function() {
+
+    scope.filter.setData('matchRegions', null);
+    scope.filter.addFilterExactMatchObject('regionId', 'matchRegions');
+
+    expect( filter.filterFunction({regionId: 10}) ).toBe(true);
+
+    scope.filter.setData('matchRegions', {11: true, 12: true, 13: true });
 
 
-    selectData.standardSelect2RequestParamFilter(scope.filter, 'platform', 'platform');
+    expect( filter.filterFunction({regionId: 10}) ).toBe(false);
 
-    // no name set initially = no filtering by name
-    expect(filter.requestParams.platform).toBe('');
-
-  });
-
-
-  xit('should be able to add a standard select2 filter', function () {
-
-    selectData.standardSelect2Filter(scope.filter, 'platform', 'platform');
-
-
-    // no name set initially = no filtering by name
-    expect(filter.values.platform).toBe('');
-    expect( filter.filterFunction({platform: 'Windows'}) ).toBe(true);
-
-    filter.values.platform = 'UBUNTU';
-    expect( filter.filterFunction({platform: 'Windows'}) ).toBe(false);
-
-    filter.values.platform = 'Windows';
-    expect( filter.filterFunction({platform: 'Windows'}) ).toBe(true);
+    expect( filter.filterFunction({regionId: 12}) ).toBe(true);
 
   });
-
-
-  xit('should be able to add cloud, (account, region) required fields ', function () {
-
-    filters.addCloudAccountFiltering(scope.filter);
-    filters.addAccountRequestParam(scope.filter);
-    filters.addRegionRequestParam(scope.filter);
-
-    // check default data
-    expect(filter.data).toEqual({
-      clouds: jasmine.any(Array),
-      accounts: [],
-      regions: [],
-      oAccount: null
-    });
-
-    expect(filter.requestParams).toEqual({
-      accountId: '',
-      regionId: ''
-    });
-
-    expect(filter.defaultValues).toEqual({
-      cloudId: ''
-    });
-
-    scope.$digest();
-    filter.requestParams.accountId = 1038;
-
-    // should update accounts when cloud changes
-    filter.values.cloudId = 'cyan';
-    scope.$digest();
-    // expect account to have been reset and data set
-    expect(filter.requestParams.accountId).toBe('');
-    expect(filter.data.accounts).toBe(accounts);
-
-    // should update regions when account changes
-    scope.filter.requestParams.regionId = 99;
-    filter.data.oAccount = {
-      billingId: 1001
-    };
-    scope.$digest();
-
-    expect(scope.filter.requestParams.regionId).toBe('');
-    expect(filter.data.regions).toBe(regions);
-
-
-
-  });
-
-
-
 
 
 });
