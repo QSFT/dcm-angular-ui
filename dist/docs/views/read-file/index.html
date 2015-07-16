@@ -1,0 +1,90 @@
+
+
+  <h1>
+    dcm-ui.read-file
+  </h1>
+
+  <p>The <code>dcm-ui.read-file</code> module allows you to use the HTML fileReader to load a file</p>
+
+
+  <div class="component-breakdown">
+    <h2>Components</h2>
+    
+    <div>
+      <h3 class="component-heading" id="directive">Directive</h3>
+      <table class="definition-table">
+        <thead>
+          <tr>
+            <th>Name</th>
+            <th>Description</th>
+          </tr>
+        </thead>
+        <tbody>
+          
+          <tr>
+            <td><a href="#/api/read-file/directive/dcmDropZone">dcmDropZone</a></td>
+            <td><p>Makes an element a drop zone for files</p>
+</td>
+          </tr>
+          
+          <tr>
+            <td><a href="#/api/read-file/directive/dcmReadFile">dcmReadFile</a></td>
+            <td><p>When the file selected by a file input control changes read the file contents are read into
+the scope variable that is specified.
+The file is read as a data uri, file or text. A base64 encoded string prefixed with &#39;data:[mime type],&#39;.</p>
+</td>
+          </tr>
+          
+        </tbody>
+      </table>
+    </div>
+    
+  </div>
+
+  
+
+
+  
+  <h2 id="example">Example</h2><p>
+
+<div>
+<!--   <a ng-click="openPlunkr('examples/example-read-file-demo')" class="btn pull-right">
+    <i class="glyphicon glyphicon-edit">&nbsp;</i>
+    Edit in Plunker</a> -->
+
+  <div class="runnable-example"
+      path="examples/example-read-file-demo"
+      name="read-file-demo"
+      module="dcm-ui.read-file">
+
+  
+    <div class="runnable-example-file" 
+      name="script.js"
+      language="js"
+      type="js">
+      <pre><code>angular.module(&#39;dcm-ui.read-file&#39;)&#10;  .run([&#39;$rootScope&#39;,&#10;    function($rootScope) {&#10;&#10;      $rootScope.data = {&#10;        singleFile: undefined,&#10;        singleFileContent: &#39;&#39;,&#10;        multiFile: [],&#10;        multiFileContent: []&#10;      };&#10;&#10;  }])&#10;;</code></pre>
+    </div>
+  
+    <div class="runnable-example-file" 
+      name="index.html"
+      language="html"
+      type="html">
+      <pre><code>&lt;form class=&quot;form&quot;&gt;&#10;&#10;  &lt;div class=&quot;form-group&quot; dcm-drop-zone=&quot;singleUploadHandler&quot;&gt;&#10;&#10;    &lt;div class=&quot;drop-zone-message&quot;&gt;&#10;      &lt;h3&gt;Drop a single file here&lt;/h3&gt;&#10;    &lt;/div&gt;&#10;&#10;    &lt;label for=&quot;exampleInput1&quot;&gt;Load File&lt;/label&gt;&#10;    &lt;input&#10;      type=&quot;file&quot;&#10;      dcm-read-file=&quot;data.singleFile&quot;&#10;      ng-model=&quot;data.singleFileContent&quot;&#10;      id=&quot;exampleInput1&quot;&#10;      class=&quot;form-control&quot;&#10;      format=&quot;auto&quot;&#10;      drop-handler=&quot;singleUploadHandler&quot;&#10;    &gt;&#10;  &lt;/div&gt;&#10;&#10;  &lt;div class=&quot;form-group&quot; dcm-drop-zone=&quot;multiUploadHandler&quot;&gt;&#10;&#10;    &lt;div class=&quot;drop-zone-message&quot;&gt;&#10;      &lt;h3&gt;Drop file(s) here&lt;/h3&gt;&#10;    &lt;/div&gt;&#10;&#10;    &lt;label for=&quot;exampleInput2&quot;&gt;Load Multiple Files&lt;/label&gt;&#10;    &lt;input&#10;      type=&quot;file&quot;&#10;      multiple&#10;      dcm-read-file=&quot;data.multiFile&quot;&#10;      ng-model=&quot;data.multiFileContent&quot;&#10;      id=&quot;exampleInput2&quot;&#10;      class=&quot;form-control&quot;&#10;      drop-handler=&quot;multiUploadHandler&quot;&#10;    &gt;&#10;  &lt;/div&gt;&#10;&#10;&#10;&lt;/form&gt;&#10;&#10;&lt;div class=&quot;panel panel-default&quot;&gt;&#10;  &lt;div class=&quot;panel-heading&quot;&gt;&#10;    &lt;h3 class=&quot;panel-title&quot;&gt;Single File Content&lt;/h3&gt;&#10;  &lt;/div&gt;&#10;  &lt;div class=&quot;panel-body&quot;&gt;&#10;    {{data.singleFileContent}}&#10;  &lt;/div&gt;&#10;&lt;/div&gt;&#10;&#10;&lt;div class=&quot;panel panel-default&quot;&gt;&#10;  &lt;div class=&quot;panel-heading&quot;&gt;&#10;    &lt;h3 class=&quot;panel-title&quot;&gt;Multiple Files&lt;/h3&gt;&#10;  &lt;/div&gt;&#10;  &lt;div class=&quot;panel-body&quot;&gt;&#10;&#10;    &lt;div class=&quot;file&quot; ng-repeat=&quot;file in data.multiFile&quot;&gt;&#10;&#10;      &lt;h4&gt;{{ file.name }}&lt;/h4&gt;&#10;      &lt;dl class=&quot;dl-horizontal&quot;&gt;&#10;        &lt;dt ng-repeat-start=&quot;(key, val) in file&quot;&gt;{{key}}&lt;/dt&gt;&#10;        &lt;dd ng-repeat-end&gt;{{val}}&lt;/dd&gt;&#10;      &lt;/dl&gt;&#10;&#10;    &lt;/div&gt;&#10;&#10;  &lt;/div&gt;&#10;&lt;/div&gt;</code></pre>
+    </div>
+  
+    <div class="runnable-example-file" 
+      name="style.css"
+      language="css"
+      type="css">
+      <pre><code>dd {&#10;  text-overflow: ellipsis;&#10;  overflow: hidden;&#10;  width: 440px;&#10;}&#10;&#10;.form-group {&#10;  margin: 15px 5px;&#10;}&#10;&#10;.drop-zone-message {&#10;  display: none;&#10;}&#10;&#10;.drop-zone-message h3 {&#10;  position: absolute;&#10;  top: 25%;&#10;  margin: 0;&#10;  width: 100%;&#10;}&#10;&#10;.drop-zone-hover {&#10;  outline: 1px dashed grey;&#10;  position: relative;&#10;}&#10;&#10;.drop-zone-hover .drop-zone-message {&#10;  display: block;&#10;  position: absolute;&#10;  z-index: 100;&#10;  background: #ffffff;&#10;  width: 100%;&#10;  height: 100%;&#10;  text-align: center;&#10;}</code></pre>
+    </div>
+  
+
+    <iframe class="runnable-example-frame" src="examples/example-read-file-demo/index.html" name="example-read-file-demo"></iframe>
+  </div>
+</div>
+
+
+</p>
+
+

@@ -1,0 +1,9 @@
+{
+  "name": "example-read-file-demo",
+  "files": [
+    "index.html",
+    "script.js",
+    "style.css"
+    
+  ]
+}
