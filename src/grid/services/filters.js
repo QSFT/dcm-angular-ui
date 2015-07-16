@@ -15,26 +15,40 @@ angular.module('dcm-ui.grid')
     // Service logic
     // ...
 
-    var valueOrEmptyString = function(val, val2) {
+    var valueOrEmptyString = function(val) {
       if (val === undefined) {
-        if (val2 === undefined) {
-          return '';
-        } else {
-          return val2;
-        }
+        return '';
       } else {
         return val;
       }
     };
 
 
+    // combine + dedupe fields to search
+    var combineFields = function(additionalFields, idField) {
 
-    // var isValid = function(val) {
-    //   if (val && val.toString() !== '') {
-    //     return true;
-    //   }
-    //   return false;
-    // };
+      var oFields = {};
+      var aRet = [];
+
+      // add idfeild to returned fields
+      oFields[idField] = true;
+
+      // add any additional fields
+      if (additionalFields && angular.isArray(additionalFields) && additionalFields.length) {
+        for (var i = 0; i < additionalFields.length; i++) {
+          oFields[additionalFields[i]] = true;
+        }
+      }
+
+      for (var field in oFields) {
+        aRet.push(field);
+      }
+
+      return aRet;
+
+    };
+
+
 
 
     var _public = {
@@ -79,32 +93,11 @@ angular.module('dcm-ui.grid')
         };
 
         filter.onChange = function(type, field, fn) {
-          scope.$watch(function(){ return filter[type][field]; }, function(newVal, oldVal){
-            fn(newVal, oldVal);
-          });
+          scope.$watch(function(){ return filter[type][field]; }, fn);
         };
 
         filter.onCollectionChange = function(type, field, fn) {
-          scope.$watchCollection(function(){ return filter[type][field]; }, function(newVal, oldVal){
-            fn(newVal, oldVal);
-          });
-        };
-
-
-
-        filter.addFilterExactMatch = function(idField) {
-
-          filter.filterFunctions.push(
-            function(oFilterData, oRowData) {
-              if (oFilterData[idField] !== '') {
-                if (oFilterData[idField].toString() !== oRowData[idField].toString()) {
-                  return false;
-                }
-              }
-              return true;
-            }
-          );
-
+          scope.$watchCollection(function(){ return filter[type][field]; }, fn);
         };
 
         filter.addFilterExactMatchObject = function(idField, matchObject) {
@@ -113,7 +106,6 @@ angular.module('dcm-ui.grid')
             function(oFilterData, oRowData) {
 
               if (filter.data[matchObject]) {
-
                 if (!filter.data[matchObject][oRowData[idField]]) {
                   return false;
                 }
@@ -160,49 +152,80 @@ angular.module('dcm-ui.grid')
 
         };
 
-        filter.addFilterPartialMatch = function(idField, interpolationString) {
-          var interpolate, strSearch;
-          if (interpolationString) {
-            interpolate = $interpolate(interpolationString);
-          }
-          filter.filterFunctions.push(
-            function(oFilterData, oRowData) {
-              if (oFilterData[idField] !== '') {
-                if (interpolationString){
-                  strSearch = interpolate(oRowData);
-                } else {
-                  strSearch = oRowData[idField];
-                }
-                if (!strSearch || strSearch.toLowerCase().indexOf(oFilterData[idField].toLowerCase()) === -1) {
-                  return false;
-                }
-              }
+        filter.addFilterExactMatch = function(idField, interpolationStringOrAdditionalFields) {
+          var comparator = function(searchString, queryString) {
+            if (searchString && searchString.toLowerCase() === queryString.toLowerCase()) {
               return true;
+            } else {
+              return false;
             }
-          );
+          };
+          filter.addFilterWithComparator(comparator, idField, interpolationStringOrAdditionalFields);
         };
 
-        filter.addFilterExactPartialMatch = function(idField, interpolationString) {
-          var interpolate, strSearch;
-          if (interpolationString) {
-            interpolate = $interpolate(interpolationString);
+        filter.addFilterPartialMatch = function(idField, interpolationStringOrAdditionalFields) {
+          var comparator = function(searchString, queryString) {
+            if (searchString && searchString.toLowerCase().indexOf(queryString.toLowerCase()) !== -1) {
+              return true;
+            } else {
+              return false;
+            }
+          };
+          filter.addFilterWithComparator(comparator, idField, interpolationStringOrAdditionalFields);
+        };
+
+        // can only have interpolation string or additional search fields
+        filter.addFilterWithComparator = function(comparator, idField, interpolationStringOrAdditionalFields) {
+
+          var interpolate, searchFields;
+
+          // interpolation string provided
+          if (interpolationStringOrAdditionalFields && !angular.isArray(interpolationStringOrAdditionalFields)) {
+
+            interpolate = $interpolate(interpolationStringOrAdditionalFields);
+
+          // just a regular field search (possibly with extra fields to check)
+          } else {
+
+            searchFields = combineFields(interpolationStringOrAdditionalFields, idField);
+
           }
+
+
           filter.filterFunctions.push(
             function(oFilterData, oRowData) {
+              // check they have entered search text
               if (oFilterData[idField] !== '') {
-                if (interpolationString){
-                  strSearch = interpolate(oRowData);
+
+                var queryString = oFilterData[idField];
+                var searchField;
+
+                // search interpolated string
+                if (interpolate){
+
+                  searchField = interpolate(oRowData);
+                  if (comparator(searchField, queryString)) {
+                    return true;
+                  }
+
+                // otherwise search the search fields
                 } else {
-                  strSearch = oRowData[idField];
+                  for (var i=0; i < searchFields.length; i++) {
+                    searchField = oRowData[searchFields[i]];
+                    if (comparator(searchField, queryString)) {
+                      return true;
+                    }
+                  }
                 }
-                if (strSearch.toLowerCase().indexOf(oFilterData[idField].toLowerCase()) !== 0) {
-                  return false;
-                }
+                return false;
+
               }
               return true;
             }
           );
+
         };
+
 
         // filter when value field matches the required value (for checkboxes)
         filter.addFilterWhenValueIs = function(field, requiredValue) {
@@ -238,14 +261,14 @@ angular.module('dcm-ui.grid')
           return bDisplay;
         };
 
-        filter.addStandardTextSearchFilter = function(field, interpolationString) {
+        filter.addStandardTextSearchFilter = function(field, interpolationStringOrAdditionalFields) {
           filter.addDefaultValue(field, '');
-          filter.addFilterPartialMatch(field, interpolationString);
+          filter.addFilterPartialMatch(field, interpolationStringOrAdditionalFields);
         };
 
-        filter.addExactPartialTextSearchFilter = function(field, interpolationString) {
+        filter.addExactTextSearchFilter = function(field, interpolationStringOrAdditionalFields) {
           filter.addDefaultValue(field, '');
-          filter.addFilterExactPartialMatch(field, interpolationString);
+          filter.addFilterExactMatch(field, interpolationStringOrAdditionalFields);
         };
 
         return filter;

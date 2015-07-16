@@ -1,0 +1,35 @@
+dd {
+  text-overflow: ellipsis;
+  overflow: hidden;
+  width: 440px;
+}
+
+.form-group {
+  margin: 15px 5px;
+}
+
+.drop-zone-message {
+  display: none;
+}
+
+.drop-zone-message h3 {
+  position: absolute;
+  top: 25%;
+  margin: 0;
+  width: 100%;
+}
+
+.drop-zone-hover {
+  outline: 1px dashed grey;
+  position: relative;
+}
+
+.drop-zone-hover .drop-zone-message {
+  display: block;
+  position: absolute;
+  z-index: 100;
+  background: #ffffff;
+  width: 100%;
+  height: 100%;
+  text-align: center;
+}

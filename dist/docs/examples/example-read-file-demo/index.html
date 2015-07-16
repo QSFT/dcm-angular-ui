@@ -1,0 +1,119 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Example - example-read-file-demo</title>
+  <link href="../../assets/bower_components/bootstrap/dist/css/bootstrap.css" rel="stylesheet" type="text/css">
+  <link href="../../assets/bower_components/fontawesome/css/font-awesome.css" rel="stylesheet" type="text/css">
+  <link href="../../assets/bower_components/select2/select2.css" rel="stylesheet" type="text/css">
+  <link href="../../assets/bower_components/select2-bootstrap-css/select2-bootstrap.css" rel="stylesheet" type="text/css">
+  <link href="style.css" rel="stylesheet" type="text/css">
+  
+
+  <script src="../../assets/bower_components/underscore/underscore.js"></script>
+  <script src="../../assets/bower_components/jquery/dist/jquery.js"></script>
+  <script src="../../assets/bower_components/select2/select2.js"></script>
+  <script src="../../assets/bower_components/angular/angular.js"></script>
+  <script src="../../src/app.js"></script>
+  <script src="../../src/grid/main.js"></script>
+  <script src="../../src/helpers/main.js"></script>
+  <script src="../../src/multiple-input/main.js"></script>
+  <script src="../../src/password/main.js"></script>
+  <script src="../../src/read-file/main.js"></script>
+  <script src="../../src/resizable-cols/main.js"></script>
+  <script src="../../src/select2/main.js"></script>
+  <script src="../../src/slider/main.js"></script>
+  <script src="../../src/grid/controllers/dcmGridController.js"></script>
+  <script src="../../src/grid/directives/dcmGridColumnDirective.js"></script>
+  <script src="../../src/grid/directives/dcmGridDirective.js"></script>
+  <script src="../../src/grid/directives/dcmGridRowActionsDirective.js"></script>
+  <script src="../../src/grid/directives/dcmGridRowDirective.js"></script>
+  <script src="../../src/grid/services/datasource.js"></script>
+  <script src="../../src/grid/services/filters.js"></script>
+  <script src="../../src/helpers/services/drag.js"></script>
+  <script src="../../src/multiple-input/directives/multipleInput.js"></script>
+  <script src="../../src/password/directives/dcmPassword.js"></script>
+  <script src="../../src/read-file/directives/dcmDropZone.js"></script>
+  <script src="../../src/read-file/directives/readFileInto.js"></script>
+  <script src="../../src/resizable-cols/controllers/resizableColumnsCtrl.js"></script>
+  <script src="../../src/resizable-cols/directives/resizableColumn.js"></script>
+  <script src="../../src/resizable-cols/directives/resizableColumns.js"></script>
+  <script src="../../src/select2/directives/dcmSelect2.js"></script>
+  <script src="../../src/slider/directives/dcmSlider.js"></script>
+  <script src="../../src/slider/directives/dcmSliderHandle.js"></script>
+  <script src="script.js"></script>
+  
+
+  
+</head>
+<body ng-app="dcm-ui.read-file">
+  <form class="form">
+
+  <div class="form-group" dcm-drop-zone="singleUploadHandler">
+
+    <div class="drop-zone-message">
+      <h3>Drop a single file here</h3>
+    </div>
+
+    <label for="exampleInput1">Load File</label>
+    <input
+      type="file"
+      dcm-read-file="data.singleFile"
+      ng-model="data.singleFileContent"
+      id="exampleInput1"
+      class="form-control"
+      format="auto"
+      drop-handler="singleUploadHandler"
+    >
+  </div>
+
+  <div class="form-group" dcm-drop-zone="multiUploadHandler">
+
+    <div class="drop-zone-message">
+      <h3>Drop file(s) here</h3>
+    </div>
+
+    <label for="exampleInput2">Load Multiple Files</label>
+    <input
+      type="file"
+      multiple
+      dcm-read-file="data.multiFile"
+      ng-model="data.multiFileContent"
+      id="exampleInput2"
+      class="form-control"
+      drop-handler="multiUploadHandler"
+    >
+  </div>
+
+
+</form>
+
+<div class="panel panel-default">
+  <div class="panel-heading">
+    <h3 class="panel-title">Single File Content</h3>
+  </div>
+  <div class="panel-body">
+    {{data.singleFileContent}}
+  </div>
+</div>
+
+<div class="panel panel-default">
+  <div class="panel-heading">
+    <h3 class="panel-title">Multiple Files</h3>
+  </div>
+  <div class="panel-body">
+
+    <div class="file" ng-repeat="file in data.multiFile">
+
+      <h4>{{ file.name }}</h4>
+      <dl class="dl-horizontal">
+        <dt ng-repeat-start="(key, val) in file">{{key}}</dt>
+        <dd ng-repeat-end>{{val}}</dd>
+      </dl>
+
+    </div>
+
+  </div>
+</div>
+</body>
+</html>
