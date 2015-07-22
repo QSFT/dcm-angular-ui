@@ -4,6 +4,16 @@
   "homepage": "https://github.com/dell-oss/dcm-angular-ui",
   "description": "Angular UI components (grid, select, slider etc)",
   "license": "Apache 2.0",
+  "main": [
+    "dist/dcm-ui-grid.js",
+    "dist/dcm-ui-helpers.js",
+    "dist/dcm-ui-multiple-input.js",
+    "dist/dcm-ui-password.js",
+    "dist/dcm-ui-read-file.js",
+    "dist/dcm-ui-resizable-cols.js",
+    "dist/dcm-ui-select2.js",
+    "dist/dcm-ui-slider.js"
+  ],
   "ignore": [
     "**/.*",
     "karma*.*",
