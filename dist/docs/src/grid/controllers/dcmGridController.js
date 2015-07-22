@@ -616,7 +616,9 @@ angular.module('dcm-ui.grid')
         row.prepend(angular.element('<th class="dcm-grid-activemarker"></th>'));
 
         $scope.$watch('activeRow', function(data, previousRow){
-          ctrl.removeActiveRow(previousRow);
+          if(previousRow !== undefined) {
+            ctrl.removeActiveRow(previousRow);
+          }
           ctrl.setActiveRow(data);
         });
 
