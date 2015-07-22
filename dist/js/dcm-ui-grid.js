@@ -1387,7 +1387,9 @@ angular.module('dcm-ui.grid')
         row.prepend(angular.element('<th class="dcm-grid-activemarker"></th>'));
 
         $scope.$watch('activeRow', function(data, previousRow){
-          ctrl.removeActiveRow(previousRow);
+          if(previousRow !== undefined) {
+            ctrl.removeActiveRow(previousRow);
+          }
           ctrl.setActiveRow(data);
         });
 
@@ -1836,9 +1838,9 @@ angular.module('dcm-ui.grid')
               var selection = $window.getSelection().toString();
               if(!selection){
                 if (scope.activeRow === $row.data) {
-                  ctrl.removeActiveRow();
+                  scope.activeRow = undefined;
                 } else {
-                  ctrl.setActiveRow($row.data);
+                  scope.activeRow = $row.data;
                 }
               }
             };
@@ -2948,7 +2950,7 @@ angular.module('dcm-ui.grid')
 
         filter.addFilterExactMatch = function(idField, interpolationStringOrAdditionalFields) {
           var comparator = function(searchString, queryString) {
-            if (searchString && searchString.toLowerCase() === queryString.toLowerCase()) {
+            if (searchString && searchString.toString().toLowerCase() === queryString.toString().toLowerCase()) {
               return true;
             } else {
               return false;
@@ -2959,7 +2961,7 @@ angular.module('dcm-ui.grid')
 
         filter.addFilterPartialMatch = function(idField, interpolationStringOrAdditionalFields) {
           var comparator = function(searchString, queryString) {
-            if (searchString && searchString.toLowerCase().indexOf(queryString.toLowerCase()) !== -1) {
+            if (searchString && searchString.toString().toLowerCase().indexOf(queryString.toString().toLowerCase()) !== -1) {
               return true;
             } else {
               return false;
@@ -2970,7 +2972,7 @@ angular.module('dcm-ui.grid')
 
         filter.addFilterPartialMatchFromStart = function(idField, interpolationStringOrAdditionalFields) {
           var comparator = function(searchString, queryString) {
-            if (searchString && searchString.toLowerCase().indexOf(queryString.toLowerCase()) === 0) {
+            if (searchString && searchString.toString().toLowerCase().indexOf(queryString.toString().toLowerCase()) === 0) {
               return true;
             } else {
               return false;

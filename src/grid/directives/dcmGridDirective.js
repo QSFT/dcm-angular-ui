@@ -243,9 +243,9 @@ angular.module('dcm-ui.grid')
               var selection = $window.getSelection().toString();
               if(!selection){
                 if (scope.activeRow === $row.data) {
-                  ctrl.removeActiveRow();
+                  scope.activeRow = undefined;
                 } else {
-                  ctrl.setActiveRow($row.data);
+                  scope.activeRow = $row.data;
                 }
               }
             };
