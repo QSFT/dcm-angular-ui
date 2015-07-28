@@ -28,6 +28,13 @@ angular.module('dcm-ui.resizable-cols')
           ctrl.table = table;
           ctrl.visible = false;
 
+
+          if (attrs.columnMinWidth) {
+            ctrl.minimumWidth = parseInt(attrs.columnMinWidth, 10);
+          } else {
+            ctrl.minimumWidth = 10;
+          }
+
           scope.$watch(function(){
             return table[0].offsetWidth;
           }, function(visible){

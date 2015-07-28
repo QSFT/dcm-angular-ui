@@ -20,13 +20,16 @@ describe('Controller: ResizableColumnsCtrl', function () {
       $scope: scope
     });
 
+    ctrl.table = angular.element('<table>');
+
     aCols = [
       angular.element('<th class="resizable-column">first col</th>'),
       angular.element('<th class="resizable-column">second col</th>'),
-      angular.element('<th">third col</th>')
+      angular.element('<th>third col</th>')
     ];
 
     dragHandleTemplate  = '<a class="resizable-columns-drag-handle"></a>';
+
 
   }));
 
@@ -51,15 +54,18 @@ describe('Controller: ResizableColumnsCtrl', function () {
 
   });
 
-  it('should allow us to remove a col', function () {
+  it('should allow us to remove cols', function () {
 
-    angular.forEach(aCols, function(col){
-      ctrl.addCol(col, angular.element(dragHandleTemplate));
-    });
 
-    ctrl.removeCol(aCols[1]);
+    ctrl.addCol(aCols[0], angular.element(dragHandleTemplate));
+    ctrl.addCol(aCols[1], angular.element(dragHandleTemplate));
+    ctrl.addAutoCol(aCols[2]);
 
-    expect(ctrl.cols.length).toBe(2);
+
+    ctrl.removeCol(aCols[0]);
+    ctrl.removeCol(aCols[2]);
+
+    expect(ctrl.cols.length).toBe(1);
 
   });
 
@@ -74,6 +80,23 @@ describe('Controller: ResizableColumnsCtrl', function () {
     $timeout.flush();
 
     expect(ctrl.resizeAll.calls.count()).toBe(1);
+
+  });
+
+
+  it('should make sure all cols are at least the min size', function() {
+
+    aCols[0].width(1);
+
+    ctrl.minimumWidth = 20;
+
+    ctrl.addCol(aCols[0], angular.element(dragHandleTemplate));
+    ctrl.addCol(aCols[1], angular.element(dragHandleTemplate));
+    ctrl.addAutoCol(aCols[2]);
+
+    $timeout.flush();
+
+    expect(aCols[0].width()).toBe(20);
 
   });
 
