@@ -18,7 +18,7 @@ describe('Directive: resizableColumn', function () {
 
     scope = $rootScope.$new();
 
-    var parentTable = angular.element('<table class="resizable-columns" style="width:1000px;">');
+    var parentTable = angular.element('<table class="resizable-columns" column-min-width="20" style="width:1000px;">');
 
     parentTable.append(angular.element('<thead>'));
 
@@ -122,11 +122,7 @@ describe('Directive: resizableColumn', function () {
   }));
 
   it('should set style/width attributes on all cells widthout one', function(){
-    expect(col2.attr('style').match(/(\b|;)\s*width\s*:\s*\d+px\s*;\s*/)).toBeTruthy();
-  });
-
-  it('should not change style/width attributes on cells that already have them (except final cell)', function(){
-    expect(col3.attr('style').match(/(\b|;)\s*width\s*:\s*29%\s*;\s*/)).toBeTruthy();
+    expect(col2.attr('style').match(/(\b|;)\s*width\s*:\s*\d+(\.\d?)%\s*;\s*/)).toBeTruthy();
   });
 
   it('should set the last cols style/width attribute to auto', function(){
@@ -187,13 +183,7 @@ describe('Directive: resizableColumn', function () {
 
   it('should set any non resizable resized cells to width:auto', function(){
 
-    var col3Initial = getPos(col3);
 
-    dragCol(col3, col3Drag, 20);
-
-    var newCol3 = getPos(col3);
-
-    expect(newCol3.width).toBe(col3Initial.width + 20);
     expect($.trim(col4.attr('style'))).toBe('width: auto;');
 
   });

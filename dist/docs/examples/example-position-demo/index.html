@@ -1,0 +1,64 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Example - example-position-demo</title>
+  <link href="../../assets/bower_components/bootstrap/dist/css/bootstrap.css" rel="stylesheet" type="text/css">
+  <link href="../../assets/bower_components/fontawesome/css/font-awesome.css" rel="stylesheet" type="text/css">
+  <link href="../../assets/bower_components/select2/select2.css" rel="stylesheet" type="text/css">
+  <link href="../../assets/bower_components/select2-bootstrap-css/select2-bootstrap.css" rel="stylesheet" type="text/css">
+  <link href="styles.css" rel="stylesheet" type="text/css">
+  
+
+  <script src="../../assets/bower_components/underscore/underscore.js"></script>
+  <script src="../../assets/bower_components/jquery/dist/jquery.js"></script>
+  <script src="../../assets/bower_components/select2/select2.js"></script>
+  <script src="../../assets/bower_components/angular/angular.js"></script>
+  <script src="../../src/app.js"></script>
+  <script src="../../src/grid/main.js"></script>
+  <script src="../../src/helpers/main.js"></script>
+  <script src="../../src/multiple-input/main.js"></script>
+  <script src="../../src/password/main.js"></script>
+  <script src="../../src/position/main.js"></script>
+  <script src="../../src/read-file/main.js"></script>
+  <script src="../../src/resizable-cols/main.js"></script>
+  <script src="../../src/select2/main.js"></script>
+  <script src="../../src/slider/main.js"></script>
+  <script src="../../src/grid/controllers/dcmGridController.js"></script>
+  <script src="../../src/grid/directives/dcmGridColumnDirective.js"></script>
+  <script src="../../src/grid/directives/dcmGridDirective.js"></script>
+  <script src="../../src/grid/directives/dcmGridRowActionsDirective.js"></script>
+  <script src="../../src/grid/directives/dcmGridRowDirective.js"></script>
+  <script src="../../src/grid/services/datasource.js"></script>
+  <script src="../../src/grid/services/filters.js"></script>
+  <script src="../../src/helpers/services/drag.js"></script>
+  <script src="../../src/multiple-input/directives/multipleInput.js"></script>
+  <script src="../../src/password/directives/dcmPassword.js"></script>
+  <script src="../../src/position/directives/dcmPosition.js"></script>
+  <script src="../../src/position/services/dcmWindowInfo.js"></script>
+  <script src="../../src/read-file/directives/dcmDropZone.js"></script>
+  <script src="../../src/read-file/directives/readFileInto.js"></script>
+  <script src="../../src/resizable-cols/controllers/resizableColumnsCtrl.js"></script>
+  <script src="../../src/resizable-cols/directives/resizableColumn.js"></script>
+  <script src="../../src/resizable-cols/directives/resizableColumns.js"></script>
+  <script src="../../src/select2/directives/dcmSelect2.js"></script>
+  <script src="../../src/slider/directives/dcmSlider.js"></script>
+  <script src="../../src/slider/directives/dcmSliderHandle.js"></script>
+  
+
+  
+</head>
+<body ng-app="dcm-ui.position">
+  <div class="container">
+
+  <span dcm-position="thisPosition" class="positionedBox">
+    {{thisPosition | json}}
+  </span>
+
+  <span dcm-position="thisPosition2" class="positionedBox2">
+    {{thisPosition2 | json}}
+  </span>
+
+</div>
+</body>
+</html>
