@@ -2,11 +2,12 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>Example - example-grid-demo1</title>
+  <title>Example - example-position-demo</title>
   <link href="../../assets/bower_components/bootstrap/dist/css/bootstrap.css" rel="stylesheet" type="text/css">
   <link href="../../assets/bower_components/fontawesome/css/font-awesome.css" rel="stylesheet" type="text/css">
   <link href="../../assets/bower_components/select2/select2.css" rel="stylesheet" type="text/css">
   <link href="../../assets/bower_components/select2-bootstrap-css/select2-bootstrap.css" rel="stylesheet" type="text/css">
+  <link href="styles.css" rel="stylesheet" type="text/css">
   
 
   <script src="../../assets/bower_components/underscore/underscore.js"></script>
@@ -43,30 +44,20 @@
   <script src="../../src/select2/directives/dcmSelect2.js"></script>
   <script src="../../src/slider/directives/dcmSlider.js"></script>
   <script src="../../src/slider/directives/dcmSliderHandle.js"></script>
-  <script src="app.js"></script>
   
 
   
 </head>
-<body ng-app="dcm-ui.grid">
-   <div ng-controller="GridExampleCtrl">
+<body ng-app="dcm-ui.position">
+  <div class="container">
 
-    <dcm-grid
-      datasource="tableData"
-      width="100%"
-    >
+  <span dcm-position="thisPosition" class="positionedBox">
+    {{thisPosition | json}}
+  </span>
 
-      <dcm-grid-row>
-        <dcm-grid-column title="Name">{{fname}} {{lname}}</dcm-grid-column>
-        <dcm-grid-column title="Age">{{age}}</dcm-grid-column>
-        <dcm-grid-column title="Serial">{{uuid}}</dcm-grid-column>
-      </dcm-grid-row>
-
-      <dcm-grid-row-actions>
-          We can include additional controls here for when a row is "active" (they are transcluded in the context of this row)
-      </dcm-grid-row-actions>
-
-    </dcm-grid>
+  <span dcm-position="thisPosition2" class="positionedBox2">
+    {{thisPosition2 | json}}
+  </span>
 
 </div>
 </body>

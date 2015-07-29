@@ -1,0 +1,97 @@
+
+
+  <h1>
+    dcm-ui.position
+  </h1>
+
+  <p>The <code>dcm-ui.position</code> module sets positional info for an element to a variable</p>
+<p>requires: jquery</p>
+
+
+  <div class="component-breakdown">
+    <h2>Components</h2>
+    
+    <div>
+      <h3 class="component-heading" id="directive">Directive</h3>
+      <table class="definition-table">
+        <thead>
+          <tr>
+            <th>Name</th>
+            <th>Description</th>
+          </tr>
+        </thead>
+        <tbody>
+          
+          <tr>
+            <td><a href="#/api/position/directive/dcmPosition">dcmPosition</a></td>
+            <td><p>Provides positional info for an element</p>
+</td>
+          </tr>
+          
+        </tbody>
+      </table>
+    </div>
+    
+    <div>
+      <h3 class="component-heading" id="service">Service</h3>
+      <table class="definition-table">
+        <thead>
+          <tr>
+            <th>Name</th>
+            <th>Description</th>
+          </tr>
+        </thead>
+        <tbody>
+          
+          <tr>
+            <td><a href="#/api/position/service/dcmWindowInfo">dcmWindowInfo</a></td>
+            <td><p>Returns an object containing the width and height of the current browser window</p>
+</td>
+          </tr>
+          
+        </tbody>
+      </table>
+    </div>
+    
+  </div>
+
+  
+
+
+  
+  <h2 id="example">Example</h2><p>
+
+<div>
+<!--   <a ng-click="openPlunkr('examples/example-position-demo')" class="btn pull-right">
+    <i class="glyphicon glyphicon-edit">&nbsp;</i>
+    Edit in Plunker</a> -->
+
+  <div class="runnable-example"
+      path="examples/example-position-demo"
+      name="position-demo"
+      module="dcm-ui.position">
+
+  
+    <div class="runnable-example-file" 
+      name="index.html"
+      language="html"
+      type="html">
+      <pre><code>&lt;div class=&quot;container&quot;&gt;&#10;&#10;  &lt;span dcm-position=&quot;thisPosition&quot; class=&quot;positionedBox&quot;&gt;&#10;    {{thisPosition | json}}&#10;  &lt;/span&gt;&#10;&#10;  &lt;span dcm-position=&quot;thisPosition2&quot; class=&quot;positionedBox2&quot;&gt;&#10;    {{thisPosition2 | json}}&#10;  &lt;/span&gt;&#10;&#10;&lt;/div&gt;</code></pre>
+    </div>
+  
+    <div class="runnable-example-file" 
+      name="styles.css"
+      language="css"
+      type="css">
+      <pre><code>.container {&#10;  position: relative;&#10;  height: 400px;&#10;}&#10;&#10;.positionedBox {&#10;  position: absolute;&#10;  top: 25px;&#10;  left: 25px;&#10;  border: 1px dashed red;&#10;  padding: 20px;&#10;}&#10;&#10;.positionedBox2 {&#10;  position: absolute;&#10;  top: 100px;&#10;  left: 150px;&#10;  border: 1px dashed red;&#10;  padding: 20px;&#10;}</code></pre>
+    </div>
+  
+
+    <iframe class="runnable-example-frame" src="examples/example-position-demo/index.html" name="example-position-demo"></iframe>
+  </div>
+</div>
+
+
+</p>
+
+
