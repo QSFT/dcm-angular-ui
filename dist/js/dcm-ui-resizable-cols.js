@@ -75,6 +75,10 @@ angular.module('dcm-ui.resizable-cols')
     var cols = ctrl.cols = [];
     var dragHandles = [];
 
+    var autoCols = ctrl.autoCols = [];
+
+    var managedCols = [];
+
     // box to show the resizing line
     ctrl.dragBox = angular.element('<div class="resizable-columns-drag-box" style="position: absolute;">');
 
@@ -85,8 +89,22 @@ angular.module('dcm-ui.resizable-cols')
 
     var pendingResize = false;
 
+
+    ctrl.addAutoCol = function(col) {
+      autoCols.push(col);
+      managedCols.push(col);
+
+      if (!pendingResize) {
+        pendingResize = true;
+        // we need to resize on the digest to make sure all col changes have completed
+        $timeout(ctrl.resizeAll, 0);
+      }
+
+    };
+
     ctrl.addCol = function(col, dragHandle) {
       cols.push(col);
+      managedCols.push(col);
       dragHandles.push(dragHandle);
 
       if (!pendingResize) {
@@ -99,17 +117,97 @@ angular.module('dcm-ui.resizable-cols')
 
     ctrl.removeCol = function(col) {
       var idx = cols.indexOf(col);
-      cols.splice(idx,1);
-      dragHandles.splice(idx,1);
+      if (idx > -1) {
+        cols.splice(idx,1);
+        dragHandles.splice(idx,1);
+      } else {
+        idx = autoCols.indexOf(col);
+        autoCols.splice(idx,1);
+      }
+      idx = managedCols.indexOf(col);
+      managedCols.splice(idx,1);
     };
 
 
+    // take 5% total from all other resizable cells so this cell will have space.
     ctrl.resizeAll = function() {
 
-      // console.log('time to resize!...');
+      var shortAmount = 0;
+      var shortCols = 0;
+
+      var i, thisWidth;
+
+      var initialWidths = [];
+
+      for (i = 0; i< managedCols.length; i++) {
+        thisWidth = managedCols[i].width();
+        initialWidths.push(thisWidth);
+        if (thisWidth < ctrl.minimumWidth) {
+          shortAmount += ctrl.minimumWidth - thisWidth;
+          shortCols++;
+        }
+      }
+
+      var reduceColsAmt = shortAmount / (managedCols.length - shortCols);
+
+      var adjustedAmount = 0;
+
+      // increase rows under min width + reduce rows over min width
+      for (i = 0; i < managedCols.length; i++) {
+
+        thisWidth = initialWidths[i];
+
+        if (thisWidth <  ctrl.minimumWidth) {
+          managedCols[i].width(ctrl.minimumWidth);
+          adjustedAmount +=  (ctrl.minimumWidth - thisWidth);
+          initialWidths[i] = ctrl.minimumWidth;
+          // console.log('increased wide: ', ctrl.minimumWidth - thisWidth)
+        } else {
+          var reduceThisAmt = Math.min(thisWidth - ctrl.minimumWidth, reduceColsAmt);
+          managedCols[i].width(thisWidth - reduceThisAmt);
+          adjustedAmount -= reduceThisAmt;
+          initialWidths[i] = thisWidth - reduceThisAmt;
+          // console.log('decrease wide: ', reduceThisAmt)
+        }
+
+      }
+
+      // anything that couldn't be removed evenly we'll take from anywhere we can
+      if (adjustedAmount > 0) {
+
+        for (i = 0; i < managedCols.length; i++) {
+
+          thisWidth = initialWidths[i];
+
+          if (adjustedAmount && thisWidth > ctrl.minimumWidth) {
+            var reduceByLeftoverAmt = Math.min(thisWidth - ctrl.minimumWidth, adjustedAmount);
+            managedCols[i].width(thisWidth - reduceByLeftoverAmt);
+            adjustedAmount -= reduceByLeftoverAmt;
+            initialWidths[i] = thisWidth - reduceByLeftoverAmt;
+            // console.log('decrease wide: ', reduceByLeftoverAmt)
+          }
+
+        }
+
+      }
+
+
+      // set rows back to pct / auto;
+      var rowWidth = ctrl.table.outerWidth(true);
+
+      for (i = 0; i< cols.length; i++) {
+        var cell = cols[i];
+        var widthPct = (Math.round((cell.outerWidth(true) / rowWidth) * 10000) / 100).toString() + '%';
+        cell.css('width', widthPct);
+      }
+
+      for (i = 0; i< autoCols.length; i++) {
+        autoCols[i].css('width', 'auto');
+      }
 
 
       pendingResize = false;
+
 
     };
 
@@ -134,6 +232,7 @@ angular.module('dcm-ui.resizable-cols')
 
         return function(scope, cell, attrs, ctrl) { // , attrs
 
+
           // find the next cell over
           var nextCell =  cell.next();
 
@@ -145,6 +244,9 @@ angular.module('dcm-ui.resizable-cols')
 
             // set the width to auto
             cell.css('width', 'auto');
+
+            // add to list of auto sized cols
+            ctrl.addAutoCol(cell);
 
           // otherwise this is a valid col to make resizable...
           } else {
@@ -193,13 +295,51 @@ angular.module('dcm-ui.resizable-cols')
               // position drag handle
               positionDragHandle();
 
-              // make sure the cell is sized
-              // if this cell doesn't have a style attribute with width set, set one
-              if (!cell.attr('style') || !cell.attr('style').match(/(\b|;)\s*width\s*:/)) {
-                cell.width(cell.width());
-              }
-
             }, 0);
+
+
+
+            var getWidths = function() {
+
+              var currentWidth = cell.width();
+              var currentNextWidth = nextCell.width();
+              var combinedWidth = currentWidth + currentNextWidth;
+              var minWidth = Math.round(getContentWidth(cell));
+              var minNext = Math.round(getContentWidth(nextCell));
+              var maxWidth = combinedWidth - minNext;
+
+              return {
+                current: currentWidth,
+                currentNext: currentNextWidth,
+                combined: combinedWidth,
+                min: minWidth,
+                minNext: minNext,
+                max: maxWidth,
+                nextResizable: nextCell.is('.resizable-column')
+              };
+            };
+
+
+            // returns the width of the cell contents (constrained by cell width)
+            var getContentWidth = function(cell) {
+
+              // create a span to calc width of content
+              var sizing = angular.element('<span style="display:inline; padding: 0; margin: 0;">');
+              cell.append(sizing);
+              sizing.append(cell.contents());
+
+              // get width of span
+              var width = sizing.outerWidth(true);
+
+              // remove span
+              cell.append(sizing.contents());
+              sizing.remove();
+
+              return width;
+
+            };
+
+
 
 
             var newX = function(posChange, widths) {
@@ -248,9 +388,9 @@ angular.module('dcm-ui.resizable-cols')
               if (Math.abs(newWidth - widths.current) >= 1) {
 
                 // if a cell is not resizable set it to width:auto
-                if (!widths.nextResizable) {
-                  nextCell.css('width', 'auto');
-                }
+                // if (!widths.nextResizable) {
+                //   nextCell.css('width', 'auto');
+                // }
 
                 // if we are downsizing the first cell, or if the second isn't resizable
                 if (newWidth < widths.current || !widths.nextResizable) {
@@ -290,26 +430,6 @@ angular.module('dcm-ui.resizable-cols')
 
             };
 
-            var getWidths = function() {
-
-              var currentWidth = cell.width();
-              var currentNextWidth = nextCell.width();
-              var combinedWidth = currentWidth + currentNextWidth;
-              var minWidth = Math.round(getContentWidth(cell));
-              var minNext = Math.round(getContentWidth(nextCell));
-              var maxWidth = combinedWidth - minNext;
-
-              return {
-                current: currentWidth,
-                currentNext: currentNextWidth,
-                combined: combinedWidth,
-                min: minWidth,
-                minNext: minNext,
-                max: maxWidth,
-                nextResizable: nextCell.is('.resizable-column')
-              };
-            };
-
             var mouseDown = function() {
 
               var widths = getWidths();
@@ -344,24 +464,6 @@ angular.module('dcm-ui.resizable-cols')
 
 
 
-            // returns the width of the cell contents (constrained by cell width)
-            var getContentWidth = function(cell) {
-
-              // create a span to calc width of content
-              var sizing = angular.element('<span style="display:inline; padding: 0; margin: 0;">');
-              cell.append(sizing);
-              sizing.append(cell.contents());
-
-              // get width of span
-              var width = sizing.outerWidth(true);
-
-              // remove span
-              cell.append(sizing.contents());
-              sizing.remove();
-
-              return width;
-
-            };
 
             // magical resize time
             var mouseDblClick = function(){
@@ -451,6 +553,13 @@ angular.module('dcm-ui.resizable-cols')
 
           ctrl.table = table;
           ctrl.visible = false;
+
+
+          if (attrs.columnMinWidth) {
+            ctrl.minimumWidth = parseInt(attrs.columnMinWidth, 10);
+          } else {
+            ctrl.minimumWidth = 10;
+          }
 
           scope.$watch(function(){
             return table[0].offsetWidth;
