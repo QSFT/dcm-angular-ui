@@ -5,5 +5,6 @@ angular.module('dcm-ui', [
   'dcm-ui.grid',
   'dcm-ui.select2',
   'dcm-ui.slider',
-  'dcm-ui.read-file'
+  'dcm-ui.read-file',
+  'dcm-ui.position'
 ]);
