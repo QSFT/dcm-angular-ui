@@ -18,6 +18,7 @@
     "gulp-livereload": "^3.8.0",
     "gulp-ngmin": "^0.3.0",
     "gulp-rename": "^1.2.2",
+    "gulp-shell": "^0.4.2",
     "gulp-uglifyjs": "^0.6.2",
     "gulp-util": "^3.0.4",
     "gulp-watch": "^4.2.4",
@@ -43,7 +44,7 @@
     "type": "git",
     "url": "git://github.com/dell-oss/dcm-angular-ui.git"
   },
-  "license": "Apache 2.0",
+  "license": "Apache-2.0",
   "bugs": {
     "url": "https://github.com/dell-oss/dcm-angular-ui/issues"
   },

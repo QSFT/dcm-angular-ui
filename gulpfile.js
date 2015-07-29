@@ -6,6 +6,7 @@ var gulp = require('gulp'),
   concat = require('gulp-concat'),
   uglify = require('gulp-uglifyjs'),
   jshint = require('gulp-jshint'),
+  shell = require('gulp-shell'),
   Dgeni = require('dgeni'),
   path = require('canonical-path'),
   fs = require('fs'),
@@ -183,7 +184,7 @@ gulp.task('docs', function(callback) {
 
 
 gulp.task('build', function(callback) {
-  runSequence('clean', 'docs',  _.map(components, function(item){ return item + '-build'; }), callback);
+  runSequence('clean-build', 'docs',  _.map(components, function(item){ return item + '-build'; }), callback);
 });
 
 
@@ -225,11 +226,25 @@ gulp.task('clean-docs', function() {
 });
 
 
-
-gulp.task('clean', [], function() {
+gulp.task('clean-build', [], function() {
   return gulp.src([paths.build, paths.coverage, paths.temp], {read: false})
     .pipe(clean())
   ;
+});
+
+
+
+gulp.task('reset-dist', [], function() {
+  return gulp.src('')
+    .pipe(shell(['git checkout HEAD -- dist/']))
+  ;
+});
+
+
+// clean resets the output to the state of the previous commit
+gulp.task('clean', function(callback) {
+  var tasks = ['clean-build', 'reset-dist', callback];
+  runSequence.apply(this,tasks);
 });
 
 
