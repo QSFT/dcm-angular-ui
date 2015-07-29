@@ -154,7 +154,7 @@ angular.module('dcm-ui.grid')
 
         filter.addFilterExactMatch = function(idField, interpolationStringOrAdditionalFields) {
           var comparator = function(searchString, queryString) {
-            if (searchString && searchString.toLowerCase() === queryString.toLowerCase()) {
+            if (searchString && searchString.toString().toLowerCase() === queryString.toString().toLowerCase()) {
               return true;
             } else {
               return false;
@@ -165,7 +165,18 @@ angular.module('dcm-ui.grid')
 
         filter.addFilterPartialMatch = function(idField, interpolationStringOrAdditionalFields) {
           var comparator = function(searchString, queryString) {
-            if (searchString && searchString.toLowerCase().indexOf(queryString.toLowerCase()) !== -1) {
+            if (searchString && searchString.toString().toLowerCase().indexOf(queryString.toString().toLowerCase()) !== -1) {
+              return true;
+            } else {
+              return false;
+            }
+          };
+          filter.addFilterWithComparator(comparator, idField, interpolationStringOrAdditionalFields);
+        };
+
+        filter.addFilterPartialMatchFromStart = function(idField, interpolationStringOrAdditionalFields) {
+          var comparator = function(searchString, queryString) {
+            if (searchString && searchString.toString().toLowerCase().indexOf(queryString.toString().toLowerCase()) === 0) {
               return true;
             } else {
               return false;
@@ -269,6 +280,11 @@ angular.module('dcm-ui.grid')
         filter.addExactTextSearchFilter = function(field, interpolationStringOrAdditionalFields) {
           filter.addDefaultValue(field, '');
           filter.addFilterExactMatch(field, interpolationStringOrAdditionalFields);
+        };
+
+        filter.addTextSearchMatchFromStartFilter = function(field, interpolationStringOrAdditionalFields) {
+          filter.addDefaultValue(field, '');
+          filter.addFilterPartialMatchFromStart(field, interpolationStringOrAdditionalFields);
         };
 
         return filter;

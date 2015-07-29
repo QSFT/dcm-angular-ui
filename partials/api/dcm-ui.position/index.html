@@ -1,0 +1,62 @@
+
+
+  <h1>
+    dcm-ui.position
+  </h1>
+
+  <p>The <code>dcm-ui.position</code> module sets positional info for an element to a variable</p>
+<p>requires: jquery</p>
+
+
+  <div class="component-breakdown">
+    <h2>Components</h2>
+    
+  </div>
+
+  
+
+
+  
+  <h2 id="example">Example</h2><example name="position-demo" module="dcm-ui.position">
+    <file name="index.html">
+
+      <div class="container">
+
+        <span dcm-position="thisPosition" class="positionedBox">
+          {{thisPosition | json}}
+        </span>
+
+        <span dcm-position="thisPosition2" class="positionedBox2">
+          {{thisPosition2 | json}}
+        </span>
+
+      </div>
+    </file>
+
+    <file name="styles.css">
+
+      .container {
+        position: relative;
+        height: 400px;
+      }
+
+      .positionedBox {
+        position: absolute;
+        top: 25px;
+        left: 25px;
+        border: 1px dashed red;
+        padding: 20px;
+      }
+
+      .positionedBox2 {
+        position: absolute;
+        top: 100px;
+        left: 150px;
+        border: 1px dashed red;
+        padding: 20px;
+      }
+
+    </file>
+
+  </example>
+

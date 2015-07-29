@@ -418,9 +418,28 @@ angular.module('dcm-ui.grid')
 
             if (col.field) {
               // if this col had a sort field specified (or we could get a single field from the content...)
-              getData = function(a) {
-                return a[col.field];
-              };
+
+              if (col.field.match(/\./)) {
+                var aParts = col.field.split('.');
+                getData = function(a) {
+                  var nested = a;
+                  for (var i = 0; i < aParts.length; i++) {
+                    var key = aParts[i];
+                    if (nested.hasOwnProperty(key)) {
+                      nested = nested[key];
+                    } else {
+                      // key doesn't exist so return
+                      return;
+                    }
+                  }
+                  return nested;
+                };
+              } else {
+                getData = function(a) {
+                  return a[col.field];
+                };
+              }
+
 
             } else {
               // interpolate the content with the data
@@ -597,7 +616,9 @@ angular.module('dcm-ui.grid')
         row.prepend(angular.element('<th class="dcm-grid-activemarker"></th>'));
 
         $scope.$watch('activeRow', function(data, previousRow){
-          ctrl.removeActiveRow(previousRow);
+          if(previousRow !== undefined) {
+            ctrl.removeActiveRow(previousRow);
+          }
           ctrl.setActiveRow(data);
         });
 
