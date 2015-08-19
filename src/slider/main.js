@@ -76,7 +76,6 @@
         width: 0px;
       }
 
-
       .dcm-slider-drag-handle {
         cursor: col-resize;
         display: block;
@@ -86,6 +85,9 @@
         border-radius: 8px;
         z-index: 100;
         color: #CBCBCB;
+        position: relative;
+        margin-right: -10px;
+        float: right;
       }
 
       .dcm-slider-select-areas {
