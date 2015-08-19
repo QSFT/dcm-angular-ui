@@ -47,7 +47,7 @@ angular.module('dcm-ui.slider')
 
         // create the drag handle and add it to the page
         var dragHandle = angular.element('<a class="dcm-slider-drag-handle"></a>');
-        container.append(dragHandle);
+        bar.append(dragHandle);
 
         // this element can't have content...
         iElement.empty();
@@ -65,13 +65,14 @@ angular.module('dcm-ui.slider')
         var selectedIndex = -1;
 
         var select = function(item) {
+
           // set selected item
           $scope.selected = item;
           selectedIndex = $scope.datasource.indexOf(item);
+
           // update bar width
-          bar.css({width: 100 * (selectedIndex / ($scope.datasource.length - 1)) + '%'});
-          // move drag handle
-          dragHandle.offset({left: bar.offset().left + bar.width() - (dragHandle.width() / 2) });
+          var widthPct = 100 * (selectedIndex / ($scope.datasource.length - 1)) + '%';
+          bar.css({width: widthPct});
 
         };
 
@@ -80,19 +81,12 @@ angular.module('dcm-ui.slider')
 
           // make stdWidth an integer
           selectAreaPositions = [];
-          dragHandle.offset({top: barContainer.offset().top + (barContainer.height() / 2) - dragHandle.height() / 2 });
 
-          // position select target areas
+          // record position select target areas
           angular.forEach(selectAreas, function(item){
             var left = item.offset().left;
             selectAreaPositions.push({left: left, right: item.width() + left - 1 });
           });
-
-          if (!$scope.selected || $scope.datasource.indexOf($scope.selected) === -1) {
-            select($scope.datasource[Math.floor($scope.datasource.length / 2)]);
-          } else {
-            select($scope.selected);
-          }
 
         };
 
@@ -104,11 +98,13 @@ angular.module('dcm-ui.slider')
         dragHelper.draggable(dragHandle, {
           dragCursor: 'col-resize',
           mouseDown: function() {
-            initialDragHandleOffset = dragHandle.offset();
+            initialDragHandleOffset = bar.width();
             dragHandle.addClass('resizing');
           },
           mouseMove: function(positionChange){
-            var newCenter = initialDragHandleOffset.left + (dragHandle.width() / 2) + positionChange.dX;
+
+            var newCenter = initialDragHandleOffset + (dragHandle.width() / 2) + positionChange.dX;
+
             for (var i=0; i < selectAreaPositions.length; i++) {
               if (i !== selectedIndex) {
                 // if position is within the select area bounds
@@ -163,11 +159,11 @@ angular.module('dcm-ui.slider')
 
               // add click event
               selectArea.on('click', function(e){
+                e.stopPropagation();
+                e.preventDefault();
                 $scope.$apply(function(){
                   select(item, selectArea);
                 });
-                e.stopPropagation();
-                e.preventDefault();
               });
 
               // add to the dom
@@ -199,14 +195,13 @@ angular.module('dcm-ui.slider')
         });
 
         // watch for a programatic change of the selection
-        $scope.$watchCollection('selected', function(selected, prev){
-          if (selected !== prev) {
-            if (selected || $scope.datasource.indexOf(selected) !== -1) {
-              select(selected);
-            } else {
-              select($scope.datasource[Math.floor($scope.datasource.length / 2)]);
-            }
+        $scope.$watchCollection('selected', function(selected){
+          if (selected || $scope.datasource.indexOf(selected) !== -1) {
+            select(selected);
+          } else {
+            select($scope.datasource[Math.floor($scope.datasource.length / 2)]);
           }
+
         });
 
         var windowResize = function() {
@@ -221,8 +216,8 @@ angular.module('dcm-ui.slider')
           angular.element($window).unbind('resize', windowResize);
         });
 
-        // watch container width in case it changes
-        $scope.$watch(function(){ return container[0].offsetWidth; }, function(n, o){
+        // watch container left/width in case it changes
+        $scope.$watch(function(){ return container[0].offsetLeft + ':' + container[0].offsetWidth; }, function(n, o){
           if(n !== o) {
             updatePositions();
           }

@@ -46,11 +46,6 @@ describe('Directive: dcmSlider', function () {
   });
 
 
-  var getPos = function() {
-    var os = dragHandle.offset();
-    return {left: os.left, top: os.top, width: dragHandle.width()};
-  };
-
   var fakeMouseEvent = function(element, eventType, button, pageX, pageY) {
     var ev = document.createEvent('MouseEvent');
     ev.initMouseEvent(
@@ -67,13 +62,13 @@ describe('Directive: dcmSlider', function () {
 
   var dragSlider = function(dx) {
 
-    var nextPos = getPos();
+    var pos = dragHandle.offset();
 
-    fakeMouseEvent(dragHandle, 'mousedown', 0, nextPos.left, nextPos.top + 1);
+    fakeMouseEvent(dragHandle, 'mousedown', 0, pos.left, pos.top + 1);
     scope.$digest();
-    fakeMouseEvent(dragHandle, 'mousemove', 0, nextPos.left + dx, nextPos.top + 1);
+    fakeMouseEvent(dragHandle, 'mousemove', 0, pos.left + dx, pos.top + 1);
     scope.$digest();
-    fakeMouseEvent(dragHandle, 'mouseup', 0, nextPos.left + dx, nextPos.top + 1);
+    fakeMouseEvent(dragHandle, 'mouseup', 0, pos.left + dx, pos.top + 1);
     scope.$digest();
 
   };
@@ -136,10 +131,8 @@ describe('Directive: dcmSlider', function () {
 
     expect(scope.selectedThing).toBe(scope.aThings[4]);
 
-
     dragSlider(-300);
     scope.$digest();
-
     expect(scope.selectedThing).toBe(scope.aThings[3]);
 
   }));
@@ -207,6 +200,7 @@ describe('Directive: dcmSlider', function () {
 
       // these are in reverse order from the cols, as each is appended after the table
       dragHandle = host.find('.dcm-slider-drag-handle').eq(0);
+
       slider = host.find('.dcm-slider').eq(0);
 
 
