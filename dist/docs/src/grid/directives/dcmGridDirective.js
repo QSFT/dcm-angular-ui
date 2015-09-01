@@ -271,7 +271,7 @@ angular.module('dcm-ui.grid')
             var watchRow = function(item, key){
               var scope = this;
               scope[key] = item;
-              scope.$watch('$$gridData.' + key, function(newVal){
+              scope.$watch(function() { return scope.$$gridData[key]; }, function(newVal){
                 if (newVal !== scope[key]) {
                   scope[key] = newVal;
                 }
