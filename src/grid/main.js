@@ -361,7 +361,7 @@
 
       .dcm-grid table.dcm-grid-table {
         table-layout: fixed;
-        border-collapse: separate;
+        border-collapse: collapse;
         border-top: solid 1px #e4e4e4;
         clear: both;
       }
@@ -543,15 +543,28 @@
 
       .dcm-grid table.dcm-grid-table > thead > tr > th.dcm-grid-activemarker,
       .dcm-grid table.dcm-grid-table > tbody > tr > td.dcm-grid-activemarker {
-        padding: 0;
-        width: 3px;
+        padding: 0 0 0 12px;
+        width: 30px;
+        text-align: right;
+      }
+
+      .dcm-grid table.dcm-grid-table > tbody > tr > td.dcm-grid-activemarker:before {
+        font-family: 'FontAwesome';
+        font-size: 22px;
+        content: "\f0da";
+      }
+
+      .dcm-grid table.dcm-grid-table > tbody > tr.active > td.dcm-grid-activemarker:before {
+        content: "\f0d7";
+      }
+
+      .dcm-grid table.dcm-grid-table > tbody > tr.dcm-grid-details > td.dcm-grid-activemarker:before {
+        content: "";
       }
 
       .dcm-grid table.dcm-grid-table > tbody > tr.dcm-grid-details > td.dcm-grid-activemarker,
       .dcm-grid table.dcm-grid-table > tbody > tr.active > td.dcm-grid-activemarker {
-        background-color: #009ae2;
-        border-bottom-color: #009ae2;
-        border-top-color: #009ae2;
+        border-left: solid 5px #009ae2;
       }
 
       .dcm-grid table.dcm-grid-table > tbody > tr:hover {
@@ -566,16 +579,10 @@
       .dcm-grid table.dcm-grid-table > tbody > tr.selected.active:hover > td {
         background: #ffffcc;
         color: #737373;
+      }
+
+      .dcm-grid table.dcm-grid-table > tbody > tr.selected.active > td {
         border-bottom-color: #ffffcc;
-      }
-
-      .dcm-grid table.dcm-grid-table > tbody > tr.selected.active:hover > td.dcm-grid-activemarker {
-        background-color: #009ae2;
-        border-bottom-color: #009ae2;
-      }
-
-      .dcm-grid table.dcm-grid-table > tbody > tr.dcm-grid-details.selected > td.dcm-grid-activemarker {
-        border-bottom-color: #009ae2;
       }
 
       .dcm-grid table.dcm-grid-table > tbody > tr.dcm-grid-details.selected > td,
@@ -622,7 +629,7 @@
         // Make sure the core table works.
         table.dcm-grid-table {
           table-layout: fixed;
-          border-collapse: separate;
+          border-collapse: collapse;
           border-top: solid 1px $dcm-grid-rowShadowColor;
           clear: both;  //for firefox
         }
@@ -739,18 +746,20 @@
 
           // Ensure the active row and its rowdetail are highlighted effectively.
           > thead > tr > th.dcm-grid-activemarker,
-          > tbody > tr > td.dcm-grid-activemarker { padding: 0; width: 3px; }
+          > tbody > tr > td.dcm-grid-activemarker { padding: 0 0 0 12px; width: 30px; text-aign: right; }
+          > tbody > tr > td.dcm-grid-activemarker:before { font-family: 'FontAwesome'; font-size: 22px; content: "\f0da"; }
+          > tbody > tr.active > td.dcm-grid-activemarker:before { content: "\f0d7"; }
+          > tbody > tr.dcm-grid-details > td.dcm-grid-activemarker:before { content: ""; }
           > tbody > tr.dcm-grid-details > td.dcm-grid-activemarker,
-          > tbody > tr.active > td.dcm-grid-activemarker { background-color: $dcm-grid-activeColor; border-bottom-color: $dcm-grid-activeColor; border-top-color: $dcm-grid-activeColor; }
+          > tbody > tr.active > td.dcm-grid-activemarker { border-left: solid 5px $dcm-grid-activeColor; }
 
           // Define our hover and active states.
           > tbody > tr:hover { background: $dcm-grid-rowHoverColor; }
           > tbody > tr:hover > td { color: $dcm-grid-fontColorDark; }
           > tbody > tr.selected > td,
-          > tbody > tr.selected.active:hover > td { background: $dcm-grid-selectedBackgroundColor; color: $dcm-grid-fontColorDark; border-bottom-color: $dcm-grid-selectedBackgroundColor; }
-          > tbody > tr.selected.active:hover > td.dcm-grid-activemarker { background-color: $dcm-grid-activeColor; border-bottom-color: $dcm-grid-activeColor; }
+          > tbody > tr.selected.active:hover > td { background: $dcm-grid-selectedBackgroundColor; color: $dcm-grid-fontColorDark; }
+          > tbody > td.selected.active > td { border-bottom-color: $dcm-grid-activeColor; }
 
-          > tbody > tr.dcm-grid-details.selected > td.dcm-grid-activemarker { border-bottom-color: $dcm-grid-activeColor; }
           > tbody > tr.dcm-grid-details.selected > td,
           > tbody > tr.dcm-grid-details.selected:hover > td { border-bottom-color: $dcm-grid-rowShadowColor; color: $text-color; }
           > tbody > tr.dcm-grid-details:hover > td { border-bottom-color: $dcm-grid-rowShadowColor; color: $text-color; }
