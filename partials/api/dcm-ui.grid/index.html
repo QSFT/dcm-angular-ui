@@ -368,7 +368,7 @@ Also includes a service for managing the grid datasource and filters.</p>
 
   .dcm-grid table.dcm-grid-table {
     table-layout: fixed;
-    border-collapse: separate;
+    border-collapse: collapse;
     border-top: solid 1px #e4e4e4;
     clear: both;
   }
@@ -550,15 +550,28 @@ Also includes a service for managing the grid datasource and filters.</p>
 
   .dcm-grid table.dcm-grid-table &gt; thead &gt; tr &gt; th.dcm-grid-activemarker,
   .dcm-grid table.dcm-grid-table &gt; tbody &gt; tr &gt; td.dcm-grid-activemarker {
-    padding: 0;
-    width: 3px;
+    padding: 0 0 0 12px;
+    width: 30px;
+    text-align: right;
+  }
+
+  .dcm-grid table.dcm-grid-table &gt; tbody &gt; tr &gt; td.dcm-grid-activemarker:before {
+    font-family: &#39;FontAwesome&#39;;
+    font-size: 22px;
+    content: &quot;\f0da&quot;;
+  }
+
+  .dcm-grid table.dcm-grid-table &gt; tbody &gt; tr.active &gt; td.dcm-grid-activemarker:before {
+    content: &quot;\f0d7&quot;;
+  }
+
+  .dcm-grid table.dcm-grid-table &gt; tbody &gt; tr.dcm-grid-details &gt; td.dcm-grid-activemarker:before {
+    content: &quot;&quot;;
   }
 
   .dcm-grid table.dcm-grid-table &gt; tbody &gt; tr.dcm-grid-details &gt; td.dcm-grid-activemarker,
   .dcm-grid table.dcm-grid-table &gt; tbody &gt; tr.active &gt; td.dcm-grid-activemarker {
-    background-color: #009ae2;
-    border-bottom-color: #009ae2;
-    border-top-color: #009ae2;
+    border-left: solid 5px #009ae2;
   }
 
   .dcm-grid table.dcm-grid-table &gt; tbody &gt; tr:hover {
@@ -573,16 +586,10 @@ Also includes a service for managing the grid datasource and filters.</p>
   .dcm-grid table.dcm-grid-table &gt; tbody &gt; tr.selected.active:hover &gt; td {
     background: #ffffcc;
     color: #737373;
+  }
+
+  .dcm-grid table.dcm-grid-table &gt; tbody &gt; tr.selected.active &gt; td {
     border-bottom-color: #ffffcc;
-  }
-
-  .dcm-grid table.dcm-grid-table &gt; tbody &gt; tr.selected.active:hover &gt; td.dcm-grid-activemarker {
-    background-color: #009ae2;
-    border-bottom-color: #009ae2;
-  }
-
-  .dcm-grid table.dcm-grid-table &gt; tbody &gt; tr.dcm-grid-details.selected &gt; td.dcm-grid-activemarker {
-    border-bottom-color: #009ae2;
   }
 
   .dcm-grid table.dcm-grid-table &gt; tbody &gt; tr.dcm-grid-details.selected &gt; td,
