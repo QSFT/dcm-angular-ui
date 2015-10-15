@@ -196,23 +196,15 @@
 
 .dcm-grid table.dcm-grid-table > thead > tr > th.dcm-grid-activemarker,
 .dcm-grid table.dcm-grid-table > tbody > tr > td.dcm-grid-activemarker {
-  padding: 0 0 0 12px;
-  width: 30px;
+  padding: 0;
+  width: 20px;
   text-align: right;
 }
 
-.dcm-grid table.dcm-grid-table > tbody > tr > td.dcm-grid-activemarker:before {
-  font-family: 'FontAwesome';
-  font-size: 22px;
-  content: "\f0da";
-}
-
-.dcm-grid table.dcm-grid-table > tbody > tr.active > td.dcm-grid-activemarker:before {
-  content: "\f0d7";
-}
-
-.dcm-grid table.dcm-grid-table > tbody > tr.dcm-grid-details > td.dcm-grid-activemarker:before {
-  content: "";
+.dcm-grid table.dcm-grid-table > tbody > tr > td.dcm-grid-row-loader {
+  text-align: center;
+  vertical-align: middle;
+  font-weight: heavy;
 }
 
 .dcm-grid table.dcm-grid-table > tbody > tr.dcm-grid-details > td.dcm-grid-activemarker,

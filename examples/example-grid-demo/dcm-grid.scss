@@ -141,9 +141,6 @@ $dcm-grid-rowGradientBottom:         lighten($dcm-grid-baseColor, 2%) !default;
     // Ensure the active row and its rowdetail are highlighted effectively.
     > thead > tr > th.dcm-grid-activemarker,
     > tbody > tr > td.dcm-grid-activemarker { padding: 0 0 0 12px; width: 30px; text-aign: right; }
-    > tbody > tr > td.dcm-grid-activemarker:before { font-family: 'FontAwesome'; font-size: 22px; content: "\f0da"; }
-    > tbody > tr.active > td.dcm-grid-activemarker:before { content: "\f0d7"; }
-    > tbody > tr.dcm-grid-details > td.dcm-grid-activemarker:before { content: ""; }
     > tbody > tr.dcm-grid-details > td.dcm-grid-activemarker,
     > tbody > tr.active > td.dcm-grid-activemarker { border-left: solid 5px $dcm-grid-activeColor; }
 
