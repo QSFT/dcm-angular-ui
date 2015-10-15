@@ -2,8 +2,8 @@
 
 angular.module('dcm-ui.grid')
 
-  .controller('DCMGridCtrl', ['$scope', '$compile', '$log', '$interpolate', '$timeout',
-    function($scope, $compile, $log, $interpolate, $timeout) {
+  .controller('DCMGridCtrl', ['$scope', '$compile', '$log', '$interpolate', '$timeout', '$q',
+    function($scope, $compile, $log, $interpolate, $timeout, $q) {
 
     var ctrl = this;
 
@@ -45,7 +45,6 @@ angular.module('dcm-ui.grid')
 
     ctrl.headerRow = '';
     ctrl.aRows = [];
-
 
     // data cache (for this grid instance)
     var cacheIndex = 0;
@@ -299,6 +298,7 @@ angular.module('dcm-ui.grid')
       var rowTemplate = angular.element('<tr ng-class="{selected: $row.checked}">');
 
       var tempCol, tempCell;
+      var dataCellCount = 0;
 
       // add row attributes to row template
       ctrl.mergeAttributes(rowTemplate, ctrl.oRowAttributes);
@@ -307,6 +307,8 @@ angular.module('dcm-ui.grid')
         // loop over cols, only add enabled ones
         tempCol = ctrl.columns[colIndex];
         if (tempCol.enabled) {
+
+          dataCellCount++;
 
           // generate new cell
           tempCell = angular.element('<td>');
@@ -320,6 +322,8 @@ angular.module('dcm-ui.grid')
           rowTemplate.append(tempCell);
         }
       }
+
+
 
       // row selector
       if (ctrl.bEnableSelect) {
@@ -336,11 +340,15 @@ angular.module('dcm-ui.grid')
         rowTemplate.append(angular.element('<td ng-click="toggleChecked($row, $event);" class="dcm-grid-selectable"></td>').append(checkbox));
       }
 
-
       // active marker
       if (ctrl.bEnableActive) {
         rowTemplate.attr('ng-click', 'toggleActiveRow($row)');
-        rowTemplate.prepend(angular.element('<td class="dcm-grid-activemarker"></td>'));
+        var activeRow = angular.element('<td class="dcm-grid-activemarker"></td>');
+        if (ctrl.bRowStatus) {
+          activeRow.html(ctrl.rowStatusContent);
+        }
+        rowTemplate.prepend(activeRow);
+
       } else if (ctrl.bEnableSelect) {
         // if active rows are disabled but select is enabled, allow select by clicking row
         rowTemplate.attr('ng-click', 'toggleChecked($row, $event)');
@@ -357,10 +365,7 @@ angular.module('dcm-ui.grid')
         // merge in attributes from the <dell-row-actions> element
         ctrl.mergeAttributes(activeRowTemplate, ctrl.oRowActionsAttributes);
 
-        // set colspan to span the remaining cols
-        var colSpan = ctrl.colCount - 1;
-
-        var newCell = angular.element('<td ng-click="" colspan="' + colSpan + '">').html(ctrl.rowActionContent);
+        var newCell = angular.element('<td ng-click="" colspan="' + dataCellCount + '">').html(ctrl.rowActionContent);
 
         // add active marker if active is enabled
         if (ctrl.bEnableActive) {
@@ -368,6 +373,13 @@ angular.module('dcm-ui.grid')
         }
 
         activeRowTemplate.append(newCell);
+
+        // row selector
+        if (ctrl.bEnableSelect) {
+          activeRowTemplate.append(angular.element('<td></td>'));
+        }
+
+
         ctrl.activeRowTemplate = $compile(activeRowTemplate);
       }
 
@@ -608,6 +620,7 @@ angular.module('dcm-ui.grid')
         row.append(cell);
       }
 
+
       // setup active marker + watcher on active field in $scope
       if (ctrl.bEnableActive) {
 
@@ -641,6 +654,10 @@ angular.module('dcm-ui.grid')
         var record = ctrl.getGridData(row);
         if (record && record.row) {
           record.row.removeClass('active');
+          if (ctrl.bRowActions) {
+            record.scope.$row.open = false;
+            record.scope.$row.closed = true;
+          }
         }
         $scope.activeRow = undefined;
       }
@@ -657,9 +674,6 @@ angular.module('dcm-ui.grid')
 
       if (activeRecord && activeRecord.hasOwnProperty('row')) {
 
-        // add active class to this row
-        activeRecord.row.addClass('active');
-
         // if the active row has row actions, render the template after it
         if (ctrl.bRowActions) {
           // compile the active row template with the rows scope then append to table
@@ -669,8 +683,36 @@ angular.module('dcm-ui.grid')
             newRow.addClass('selected');
           }
           ctrl.oRowActions = newRow;
-          // append after the active row
-          activeRecord.row.after(ctrl.oRowActions);
+
+          if (ctrl.rowOpener && !(ctrl.bRowLoaderRememberOpened && activeRecord.scope.$row.openCached)) {
+            var dataPromise = ctrl.rowOpener(activeRecord.data);
+            loadingDelay(activeRecord, dataPromise);
+            $q.when(dataPromise).then(function(data){
+              ctrl.updateRowData(activeRecord, data);
+              if (ctrl.bRowLoaderRememberOpened) {
+                activeRecord.scope.$row.openCached = true;
+              }
+              // check this still the active row befor making it "active"
+              // active row may have changed while data was loading
+              if ($scope.activeRow === activeRecord.data ) {
+                activeRecord.row.addClass('active');
+                activeRecord.scope.$row.open = true;
+                activeRecord.scope.$row.closed = false;
+                activeRecord.row.after(ctrl.oRowActions);
+              }
+            });
+
+          } else {
+            // append after the active row
+            activeRecord.row.addClass('active');
+            activeRecord.row.after(ctrl.oRowActions);
+            activeRecord.scope.$row.open = true;
+            activeRecord.scope.$row.closed = false;
+          }
+
+        } else {
+          // add active class to this row (it doesn't have row actions)
+          activeRecord.row.addClass('active');
         }
 
       } else {
@@ -681,13 +723,63 @@ angular.module('dcm-ui.grid')
 
     };
 
+
+    ctrl.updateRowData = function(record, data) {
+      // update in datasource
+      angular.extend(record.data, data);
+      // update in row scope
+      angular.extend(record.scope, data);
+    };
+
+    var loadingDelay = function(rowRecord, promise) {
+
+      rowRecord.row.addClass('data-loading');
+
+      rowRecord.scope.$row.dataLoading = true;
+
+      var loadingShow = $timeout(function(){
+        rowRecord.scope.$row.showLoading = true;
+        rowRecord.row.addClass('show-loading');
+      }, ctrl.rowLoadingDelay);
+
+      $q.when(promise).finally(function(){
+        $timeout.cancel(loadingShow);
+        rowRecord.row.removeClass('data-loading');
+        rowRecord.row.removeClass('show-loading');
+        rowRecord.scope.$row.dataLoading = false;
+        rowRecord.scope.$row.showLoading = false;
+      });
+
+    };
+
+
+    ctrl.reloadTrigger = function(findRow) {
+
+      var rowRecord = _.findWhere(ctrl.aRows, findRow);
+
+      // if it's not visible anymore then it won't have been found
+      if (rowRecord) {
+        rowRecord = ctrl.getGridData(rowRecord);
+
+        var dataPromise = ctrl.reloadRow(rowRecord.data);
+        loadingDelay(rowRecord, dataPromise);
+
+        $q.when(dataPromise).then(function(data){
+          ctrl.updateRowData(rowRecord, data);
+          rowRecord.scope.$row.openCached = false;
+        });
+
+      }
+
+    };
+
     ctrl.setActiveRow = function(data) {
 
       ctrl.removeActiveRow();
+
       if (data) {
 
         $scope.activeRow = data;
-
         var activeRecord = ctrl.getGridData(data);
 
         // if the row was preselected then the active row may not be rendered yet
@@ -721,14 +813,6 @@ angular.module('dcm-ui.grid')
         }
       }
 
-      // clear caches
-      // oGridData = {};
-      // oGridHTML = {};
-
     });
-
-
-
-
 
   }]);

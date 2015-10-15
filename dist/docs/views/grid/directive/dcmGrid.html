@@ -180,6 +180,90 @@
       </td>
     </tr>
     
+    <tr>
+      <td>
+        open-row
+        
+        <div><em>(optional)</em></div>
+      </td>
+      <td>
+        <a href="" class="label type-hint type-hint-string">String</a>
+      </td>
+      <td>
+        <p>function that returns data or a promise for data to be merged
+ into row data when row is opened. row being opened is passed to it</p>
+
+        
+      </td>
+    </tr>
+    
+    <tr>
+      <td>
+        reload-row
+        
+        <div><em>(optional)</em></div>
+      </td>
+      <td>
+        <a href="" class="label type-hint type-hint-string">String</a>
+      </td>
+      <td>
+        <p>function that returns data or a promise for data to be merged
+ into row data when row is reloaded. row being reloaded is passed to it.</p>
+
+        
+      </td>
+    </tr>
+    
+    <tr>
+      <td>
+        reload-trigger
+        
+        <div><em>(optional)</em></div>
+      </td>
+      <td>
+        <a href="" class="label type-hint type-hint-string">String</a>
+      </td>
+      <td>
+        <p>sets this to a function which can be used to trigger the
+ reloading of a row, the first param is a unique selector for the row to be reloaded</p>
+
+        
+      </td>
+    </tr>
+    
+    <tr>
+      <td>
+        loading-delay
+        
+        <div><em>(optional)</em></div>
+      </td>
+      <td>
+        <a href="" class="label type-hint type-hint-integer">Integer</a>
+      </td>
+      <td>
+        <p>the default delay (ms) before adding the show-loading class to the row</p>
+
+        <p><em>(default: 500)</em></p>
+      </td>
+    </tr>
+    
+    <tr>
+      <td>
+        cache-opened-rows
+        
+        <div><em>(optional)</em></div>
+      </td>
+      <td>
+        <a href="" class="label type-hint type-hint-boolean">Boolean</a>
+      </td>
+      <td>
+        <p>if the open-row function needs to be invoked for a
+ previously opened row</p>
+
+        <p><em>(default: true)</em></p>
+      </td>
+    </tr>
+    
   </tbody>
 </table>
 
