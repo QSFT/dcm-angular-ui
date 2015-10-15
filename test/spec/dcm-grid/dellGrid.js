@@ -2,16 +2,20 @@
 
 describe('Directive: dcmGrid,', function () {
 
-  var scope, compile, $rootScope;
+  var scope, compile, $rootScope, $q, $timeout;
   //, host;
 
   beforeEach(module('dcm-ui'));
 
-  beforeEach(inject(function (_$rootScope_, $compile) {
+  beforeEach(inject(function (_$rootScope_, $compile, _$q_, _$timeout_) {
 
     $rootScope = _$rootScope_;
+    $q = _$q_;
+    $timeout = _$timeout_;
 
     scope = $rootScope.$new();
+
+
 
     compile = $compile;
 
@@ -803,5 +807,342 @@ describe('Directive: dcmGrid,', function () {
 
   });
 
+  var getState = function(row) {
+    var spans = row.find('td:first span');
+    return {
+      loading: !spans.eq(0).is('.ng-hide'),
+      open: !spans.eq(1).is('.ng-hide'),
+      closed: !spans.eq(2).is('.ng-hide')
+    };
+  };
+
+  describe('basic grid with status cell and row actions', function(){
+
+    var element, state;
+
+    beforeEach(function(){
+
+      scope.active = undefined;
+
+      element = angular.element(
+        '<dcm-grid datasource="testData" active-row="active">' +
+          '<dcm-grid-row-status>' +
+            '<span ng-show="$row.dataLoading">loading</span>' +
+            '<span ng-show="!$row.dataLoading && $row.open">open</span>' +
+            '<span ng-show="!$row.dataLoading && $row.closed">closed</span>' +
+          '</dcm-grid-row-status>' +
+          '<dcm-grid-row some-attribute="defined">' +
+            '<dcm-grid-column field="name" title="Name" width="15%">{{name}}</dcm-grid-column>' +
+            '<dcm-grid-column field="roleId" width="5%">{{roleId}}</dcm-grid-column>' +
+            '<dcm-grid-column field="description">{{description}}</dcm-grid-column>' +
+            '<dcm-grid-column some-other-attribute="defined" field="description"  title="">{{description}}</dcm-grid-column>' +
+          '</dcm-grid-row>' +
+          '<dcm-grid-row-actions>' +
+            'Hello {{name}}!' +
+          '</dcm-grid-row-actions>' +
+        '</dcm-grid>'
+      );
+
+      compile(element)(scope);
+      scope.$digest();
+
+
+
+    });
+
+    it('should render a basic grid wit grid-row-status content in the first col', function(){
+      state = getState(element.find('tbody tr:first'));
+      expect(state.loading).toBe(false);
+      expect(state.open).toBe(false);
+      expect(state.closed).toBe(true);
+    });
+
+    it('should change the row state to open when it is opened', function(){
+
+      scope.active = scope.testData[0];
+      scope.$digest();
+
+      state = getState(element.find('tbody tr:first'));
+      expect(state.loading).toBe(false);
+      expect(state.open).toBe(true);
+      expect(state.closed).toBe(false);
+
+    });
+
+    it('should change the row state back to closed when it is closed', function(){
+
+      element.find('tbody tr:first').trigger('click');
+      scope.$digest();
+
+      state = getState(element.find('tbody tr:first'));
+      expect(state.loading).toBe(false);
+      expect(state.open).toBe(true);
+      expect(state.closed).toBe(false);
+
+      element.find('tbody tr:first').trigger('click');
+      scope.$digest();
+
+      state = getState(element.find('tbody tr:first'));
+      expect(state.loading).toBe(false);
+      expect(state.open).toBe(false);
+      expect(state.closed).toBe(true);
+
+    });
+
+
+  });
+
+
+  describe('basic grid with status cell, row actions and row reload/open/trigger functions', function(){
+
+    var element, state, defer;
+
+    beforeEach(function(){
+
+      scope.active = undefined;
+
+      defer = $q.defer();
+
+      scope.loadDataFn = jasmine.createSpy('load data spy').and.returnValue(defer.promise);
+      scope.openRowFn = jasmine.createSpy('open row spy').and.returnValue(defer.promise);
+
+      element = angular.element(
+        '<dcm-grid datasource="testData" active-row="active" open-row="openRowFn" reload-row="" cache-opened-rows="true">' +
+          '<dcm-grid-row-status>' +
+            '<span ng-show="$row.dataLoading">loading</span>' +
+            '<span ng-show="!$row.dataLoading && $row.open">open</span>' +
+            '<span ng-show="!$row.dataLoading && $row.closed">closed</span>' +
+          '</dcm-grid-row-status>' +
+          '<dcm-grid-row some-attribute="defined">' +
+            '<dcm-grid-column field="name" title="Name" width="15%">{{name}}</dcm-grid-column>' +
+            '<dcm-grid-column field="roleId" width="5%">{{roleId}}</dcm-grid-column>' +
+            '<dcm-grid-column field="description">{{description}}</dcm-grid-column>' +
+            '<dcm-grid-column some-other-attribute="defined" field="description"  title="">{{description}}</dcm-grid-column>' +
+          '</dcm-grid-row>' +
+          '<dcm-grid-row-actions>' +
+            'Hello {{name}}!' +
+          '</dcm-grid-row-actions>' +
+        '</dcm-grid>'
+      );
+
+      compile(element)(scope);
+      scope.$digest();
+
+    });
+
+    it('should call the open-row function with the row data when a row is opened', function(){
+
+      element.find('tbody tr:first').trigger('click');
+      scope.$digest();
+
+      expect(scope.openRowFn).toHaveBeenCalled();
+      expect(scope.openRowFn).toHaveBeenCalledWith(scope.testData[0]);
+
+      // row should now be in loading state
+      state = getState(element.find('tbody tr:first'));
+      expect(state.loading).toBe(true);
+      expect(state.open).toBe(false);
+      expect(state.closed).toBe(false);
+      expect(scope.testData[0].name).toBe('Admin');
+
+      // resolve the open row request with aditional data
+      defer.resolve({name: 'Admin Fancypants'});
+      scope.$digest();
+
+      // row should now contain the additional data and be in the open state
+      state = getState(element.find('tbody tr:first'));
+      expect(state.loading).toBe(false);
+      expect(state.open).toBe(true);
+      expect(state.closed).toBe(false);
+      expect(scope.testData[0].name).toBe('Admin Fancypants');
+
+    });
+
+    it('should add data-loading class to the row when loading starts', function(){
+
+      element.find('tbody tr:first').trigger('click');
+      scope.$digest();
+
+      expect(element.find('tbody tr:first').is('.data-loading')).toBe(true);
+      expect(element.find('tbody tr:first').is('.show-loading')).toBe(false);
+
+    });
+
+
+    it('should only add the show-loading class to the row after the delay', function(){
+
+      element.find('tbody tr:first').trigger('click');
+      scope.$digest();
+
+      expect(element.find('tbody tr:first').is('.show-loading')).toBe(false);
+
+      $timeout.flush(500);
+
+      expect(element.find('tbody tr:first').is('.show-loading')).toBe(true);
+
+      // finish loading
+      defer.resolve();
+      scope.$digest();
+
+      // check loading classes are removed
+      expect(element.find('tbody tr:first').is('.show-loading')).toBe(false);
+      expect(element.find('tbody tr:first').is('.data-loading')).toBe(false);
+
+    });
+
+
+    it('should only load row data once if cache-opened-rows is set', function(){
+
+      element.find('tbody tr:first').trigger('click');
+      defer.resolve();
+      scope.$digest();
+
+      expect(scope.openRowFn.calls.count()).toBe(1);
+      expect(scope.openRowFn).toHaveBeenCalledWith(scope.testData[0]);
+
+      // close row
+      element.find('tbody tr:first').trigger('click');
+      scope.$digest();
+      // open row again
+      element.find('tbody tr:first').trigger('click');
+      scope.$digest();
+
+      expect(scope.openRowFn.calls.count()).toBe(1);
+
+    });
+
+
+  });
+
+
+    describe('basic grid with status cell, no caching of open rows', function(){
+
+      var element, state, defer;
+
+      beforeEach(function(){
+
+        scope.active = undefined;
+        defer = $q.defer();
+
+        scope.openRowFn = jasmine.createSpy('open row spy').and.returnValue(defer.promise);
+
+        element = angular.element(
+          '<dcm-grid datasource="testData" active-row="active" open-row="openRowFn" cache-opened-rows="false">' +
+            '<dcm-grid-row-status>' +
+              '<span ng-show="$row.dataLoading">loading</span>' +
+              '<span ng-show="!$row.dataLoading && $row.open">open</span>' +
+              '<span ng-show="!$row.dataLoading && $row.closed">closed</span>' +
+            '</dcm-grid-row-status>' +
+            '<dcm-grid-row some-attribute="defined">' +
+              '<dcm-grid-column field="name" title="Name" width="15%">{{name}}</dcm-grid-column>' +
+              '<dcm-grid-column field="roleId" width="5%">{{roleId}}</dcm-grid-column>' +
+              '<dcm-grid-column field="description">{{description}}</dcm-grid-column>' +
+              '<dcm-grid-column some-other-attribute="defined" field="description"  title="">{{description}}</dcm-grid-column>' +
+            '</dcm-grid-row>' +
+            '<dcm-grid-row-actions>' +
+              'Hello {{name}}!' +
+            '</dcm-grid-row-actions>' +
+          '</dcm-grid>'
+        );
+
+        compile(element)(scope);
+        scope.$digest();
+
+      });
+
+      it('should call the open-row function with the row data each time a row is opened', function(){
+
+        element.find('tbody tr:first').trigger('click');
+        defer.resolve();
+        scope.$digest();
+
+        expect(scope.openRowFn.calls.count()).toBe(1);
+
+        // close row
+        element.find('tbody tr:first').trigger('click');
+        scope.$digest();
+        // open row again
+        element.find('tbody tr:first').trigger('click');
+        scope.$digest();
+
+        expect(scope.openRowFn.calls.count()).toBe(2);
+
+      });
+
+
+  });
+
+
+    describe('basic grid with ability to reload a row', function(){
+
+      var element, state, defer;
+
+      beforeEach(function(){
+
+        scope.active = undefined;
+        scope.selected = [];
+        scope.reloadFn = undefined;
+
+        defer = $q.defer();
+
+        scope.loadDataFn = jasmine.createSpy('load data spy').and.returnValue(defer.promise);
+
+        element = angular.element(
+          '<dcm-grid datasource="testData" reload-row="loadDataFn" reload-trigger="reloadFn" active-row="active" selected="selected">' +
+            '<dcm-grid-row-status>' +
+              '<span ng-show="$row.dataLoading">loading</span>' +
+              '<span ng-show="!$row.dataLoading && $row.open">open</span>' +
+              '<span ng-show="!$row.dataLoading && $row.closed">closed</span>' +
+            '</dcm-grid-row-status>' +
+            '<dcm-grid-row some-attribute="defined">' +
+              '<dcm-grid-column field="name" title="Name" width="15%">{{name}}</dcm-grid-column>' +
+              '<dcm-grid-column field="roleId" width="5%">{{roleId}}</dcm-grid-column>' +
+              '<dcm-grid-column field="description">{{description}}</dcm-grid-column>' +
+              '<dcm-grid-column some-other-attribute="defined" field="description"  title="">{{description}}</dcm-grid-column>' +
+            '</dcm-grid-row>' +
+            '<dcm-grid-row-actions>' +
+              'Hello {{name}}!' +
+            '</dcm-grid-row-actions>' +
+          '</dcm-grid>'
+        );
+
+        compile(element)(scope);
+        scope.$digest();
+
+      });
+
+      it('should call the reload function on any visible row that matches the trigger', function(){
+
+        // { roleId: 5, name: 'View Only Cloud', description: 'A full view only access to cloud resources', date: '2013-10-30T16:04:18Z' }
+
+        scope.reloadFn({roleId: 2});
+        scope.$digest();
+
+        expect(scope.loadDataFn).toHaveBeenCalledWith(scope.testData[0]);
+
+        // row should now be in loading state
+        state = getState(element.find('tbody tr:first'));
+        expect(state.loading).toBe(true);
+        expect(state.open).toBe(false);
+        expect(state.closed).toBe(false);
+        expect(scope.testData[0].name).toBe('Admin');
+
+        // resolve the open row request with aditional data
+        defer.resolve({name: 'Admin Fancypants'});
+        scope.$digest();
+
+        // row should now contain the additional data and be in the open state
+        state = getState(element.find('tbody tr:first'));
+        expect(state.loading).toBe(false);
+        expect(state.open).toBe(false);
+        expect(state.closed).toBe(true);
+        expect(scope.testData[0].name).toBe('Admin Fancypants');
+
+
+      });
+
+
+
+  });
 
 });

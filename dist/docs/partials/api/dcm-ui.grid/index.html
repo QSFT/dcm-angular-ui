@@ -57,6 +57,12 @@ Also includes a service for managing the grid datasource and filters.</p>
               &lt;/button&gt;
           &lt;/div&gt;
 
+          &lt;div class=&quot;input-group input-group&quot; style=&quot;margin-left: 5px; float: left;&quot;&gt;
+              &lt;button class=&quot;btn btn btn-primary&quot; ng-click=&quot;randomReload()&quot;&gt;
+                 reload a row
+              &lt;/button&gt;
+          &lt;/div&gt;
+
           &lt;div class=&quot;input-group input-group&quot; style=&quot;width: 175px; margin-left: 5px; float: right;&quot;&gt;
               &lt;span class=&quot;input-group-addon&quot;&gt;Records/Page&lt;/span&gt;
               &lt;input type=&quot;number&quot; class=&quot;form-control input&quot; placeholder=&quot;Records&quot; ng-model=&quot;paginationOptions.perPage&quot;&gt;
@@ -151,6 +157,10 @@ Also includes a service for managing the grid datasource and filters.</p>
           sort-order=&quot;datasource.sortOrder&quot;
           edit-columns=&quot;serverGrid.cols&quot;
           store-config=&quot;grid.testGridConfig&quot;
+          open-row=&quot;serverGrid.loadRow&quot;
+          reload-row=&quot;serverGrid.loadRow&quot;
+          reload-trigger=&quot;serverGrid.triggerReload&quot;
+          cache-opened-rows=&quot;true&quot;
         &gt;
 
           &lt;dcm-grid-row ng-class=&quot;{muted: !isOnline}&quot;&gt;
@@ -158,13 +168,24 @@ Also includes a service for managing the grid datasource and filters.</p>
                 &lt;span class=&quot;{{iconColor}}&quot;&gt;&lt;i class=&quot;fa {{icon}}&quot;&gt;&lt;/i&gt;&lt;/span&gt;
             &lt;/dcm-grid-column&gt;
             &lt;dcm-grid-column width=&quot;20%&quot; title=&quot;IP Address&quot; enabled=&quot;false&quot;&gt;{{ip}}&lt;/dcm-grid-column&gt;
-            &lt;dcm-grid-column width=&quot;20%&quot; title=&quot;Service Tag&quot;&gt;{{serviceTag}}&lt;/dcm-grid-column&gt;
+            &lt;dcm-grid-column width=&quot;20%&quot; title=&quot;Service Tag&quot;&gt;{{serviceTag}} {{$row.active}}&lt;/dcm-grid-column&gt;
             &lt;dcm-grid-column width=&quot;30%&quot; title=&quot;Model&quot;&gt;{{model}}&lt;/dcm-grid-column&gt;
             &lt;dcm-grid-column width=&quot;20%&quot; title=&quot;Memory&quot; sort-type=&quot;integer&quot; enabled=&quot;true&quot;&gt;{{memory}}&lt;/dcm-grid-column&gt;
           &lt;/dcm-grid-row&gt;
 
+          &lt;dcm-grid-row-status&gt;
+            &lt;i
+              class=&quot;fa&quot;
+              ng-class=&quot;{
+                &#39;fa-spinner fa-pulse&#39;: $row.dataLoading,
+                &#39;fa-caret-down&#39;: !$row.dataLoading &amp;&amp; $row.open,
+                &#39;fa-caret-right&#39;: !$row.dataLoading &amp;&amp; $row.closed 
+              }&quot;
+            &gt;&lt;/i&gt;
+          &lt;/dcm-grid-row-status&gt;
+
           &lt;dcm-grid-row-actions ng-class=&quot;{muted: !isOnline}&quot;&gt;
-              We can include additional controls here for when a row is &quot;active&quot; (they are transcluded in the context of this row)
+            Extended info can go in here (transcluded in the context of the current row...)
           &lt;/dcm-grid-row-actions&gt;
 
         &lt;/dcm-grid&gt;
@@ -211,9 +232,15 @@ Also includes a service for managing the grid datasource and filters.</p>
 
         $scope.showConfig = false;
 
+
+        $scope.randomReload = function() {
+          var row = $scope.datasource.pageData[Math.floor(Math.random() * $scope.datasource.pageData.length)];
+          $scope.serverGrid.triggerReload({&#39;$$gridDataID&#39;: row.$$gridDataID});
+        }
+
         $scope.toggleConfig = function() {
           $scope.showConfig = !$scope.showConfig;
-        }
+        };
 
         // setup some dummy data...
 
@@ -243,7 +270,7 @@ Also includes a service for managing the grid datasource and filters.</p>
 
           var isOnline = Math.random() &gt; 0.1;
 
-          return{
+          var rowData = {
             ip: genIP(),
             isOnline: isOnline,
             icon: isOnline ? &#39;fa-check-circle&#39; : &#39;fa-exclamation-circle&#39;,
@@ -252,6 +279,8 @@ Also includes a service for managing the grid datasource and filters.</p>
             model: servers[ Math.floor(Math.random() * servers.length) ],
             memory: ram[ Math.floor(Math.random() * ram.length) ] + &#39; GB&#39;
           };
+
+          return rowData
         };
 
         var generateData = function() {
@@ -322,7 +351,16 @@ Also includes a service for managing the grid datasource and filters.</p>
         // grid config...
         $scope.serverGrid = {
           activeServer: undefined,
-          selectedServers: []
+          selectedServers: [],
+          loadRow: function(row) {
+            var def = $q.defer();
+            // wait 2 seconds then resolve promise with existing data
+            $timeout(function(){
+              def.resolve(row);
+            }, 2000);
+            return def.promise;
+          },
+          triggerReload: angular.noop
         };
 
         // pagination options
@@ -368,7 +406,7 @@ Also includes a service for managing the grid datasource and filters.</p>
 
   .dcm-grid table.dcm-grid-table {
     table-layout: fixed;
-    border-collapse: separate;
+    border-collapse: collapse;
     border-top: solid 1px #e4e4e4;
     clear: both;
   }
@@ -551,14 +589,19 @@ Also includes a service for managing the grid datasource and filters.</p>
   .dcm-grid table.dcm-grid-table &gt; thead &gt; tr &gt; th.dcm-grid-activemarker,
   .dcm-grid table.dcm-grid-table &gt; tbody &gt; tr &gt; td.dcm-grid-activemarker {
     padding: 0;
-    width: 3px;
+    width: 20px;
+    text-align: right;
+  }
+
+  .dcm-grid table.dcm-grid-table &gt; tbody &gt; tr &gt; td.dcm-grid-row-loader {
+    text-align: center;
+    vertical-align: middle;
+    font-weight: heavy;
   }
 
   .dcm-grid table.dcm-grid-table &gt; tbody &gt; tr.dcm-grid-details &gt; td.dcm-grid-activemarker,
   .dcm-grid table.dcm-grid-table &gt; tbody &gt; tr.active &gt; td.dcm-grid-activemarker {
-    background-color: #009ae2;
-    border-bottom-color: #009ae2;
-    border-top-color: #009ae2;
+    border-left: solid 5px #009ae2;
   }
 
   .dcm-grid table.dcm-grid-table &gt; tbody &gt; tr:hover {
@@ -573,16 +616,10 @@ Also includes a service for managing the grid datasource and filters.</p>
   .dcm-grid table.dcm-grid-table &gt; tbody &gt; tr.selected.active:hover &gt; td {
     background: #ffffcc;
     color: #737373;
+  }
+
+  .dcm-grid table.dcm-grid-table &gt; tbody &gt; tr.selected.active &gt; td {
     border-bottom-color: #ffffcc;
-  }
-
-  .dcm-grid table.dcm-grid-table &gt; tbody &gt; tr.selected.active:hover &gt; td.dcm-grid-activemarker {
-    background-color: #009ae2;
-    border-bottom-color: #009ae2;
-  }
-
-  .dcm-grid table.dcm-grid-table &gt; tbody &gt; tr.dcm-grid-details.selected &gt; td.dcm-grid-activemarker {
-    border-bottom-color: #009ae2;
   }
 
   .dcm-grid table.dcm-grid-table &gt; tbody &gt; tr.dcm-grid-details.selected &gt; td,

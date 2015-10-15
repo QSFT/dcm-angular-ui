@@ -41,6 +41,19 @@
  * @param {Function=} sortFunction - variable to bind the sort function provided when a col is clicked on
  * @param {string} [sortOrder=ASC] - variable to bind the sort order string to (ASC/DESC)
  *
+ * @param {String=} [open-row] - function that returns data or a promise for data to be merged
+ into row data when row is opened. row being opened is passed to it
+ *
+ * @param {String=} [reload-row] - function that returns data or a promise for data to be merged
+ into row data when row is reloaded. row being reloaded is passed to it.
+ *
+ * @param {String=} [reload-trigger] - sets this to a function which can be used to trigger the
+ reloading of a row, the first param is a unique selector for the row to be reloaded
+ *
+ * @param {Integer=}[loading-delay=500] - the default delay (ms) before adding the show-loading class to the row
+ *
+ * @param {Boolean=}[cache-opened-rows=true] - if the open-row function needs to be invoked for a
+ previously opened row
  *
  * @example
    <example name="grid-demo" module="dcm-ui.grid">
@@ -99,7 +112,13 @@ angular.module('dcm-ui.grid')
         sortFunction: '=?',
         sortOrder: '=?',
         editColumns: '=?',
-        storeConfig: '@'
+        storeConfig: '@',
+
+        openRow: '=?',
+        reloadRow: '=?',
+        reloadTrigger: '=?',
+        cacheOpenedRows: '@?',
+        loadingDelay: '@?'
       },
 
       controller: 'DCMGridCtrl',
@@ -107,8 +126,6 @@ angular.module('dcm-ui.grid')
       compile: function() {
 
         return function postLink(scope, element, attrs, ctrl) {
-
-
 
           ctrl.bEnableSelect = !!attrs.selected;
           ctrl.bEnableActive = !!attrs.activeRow;
@@ -124,6 +141,25 @@ angular.module('dcm-ui.grid')
             ctrl.notCheckedIcon = 'fa-circle-o';
           }
 
+
+          ctrl.reloadRow = scope.reloadRow;
+
+          scope.reloadTrigger = ctrl.reloadTrigger;
+
+          ctrl.rowOpener = scope.openRow;
+
+          if (scope.loadingDelay !== undefined && scope.loadingDelay.match(/^\d+$/)) {
+            ctrl.rowLoadingDelay = parseInt(scope.loadingDelay, 10);
+          } else {
+            ctrl.rowLoadingDelay = 500;
+          }
+
+          if (scope.cacheOpenedRows !== undefined && scope.cacheOpenedRows.toLowerCase() === 'false') {
+            ctrl.bRowLoaderRememberOpened = false;
+          } else {
+            ctrl.bRowLoaderRememberOpened = true;
+          }
+
           if (scope.additionalRowData) {
             ctrl.additionalRowData = scope.additionalRowData;
           }
@@ -135,6 +171,12 @@ angular.module('dcm-ui.grid')
 
           if (attrs.width) {
             table.css('width', attrs.width);
+          }
+
+          if (ctrl.bRowActions) {
+            table.addClass('has-row-actions');
+          } else {
+            table.addClass('no-row-actions');
           }
 
           // add table head to table
@@ -306,10 +348,20 @@ angular.module('dcm-ui.grid')
                   angular.extend(newScope, ctrl.additionalRowData);
                 }
 
+                // if there is a loader configured add it to the scope
+                // if (ctrl.bRowLoader) {
+                //   newScope.$$load = ctrl.rowLoader.call(newScope);
+                // }
+
                 newScope.$row = {
                   checked: (_.indexOf(aSelected, thisRow) !== -1) ? true : false,
                   data: thisRow,
-                  record: thisRecord
+                  record: thisRecord,
+                  dataLoading: false,
+                  showLoading: false,
+                  openCached: false,
+                  open: false,
+                  closed: ctrl.bRowActions ? true : false
                 };
 
 

@@ -1,6 +1,6 @@
 {
   "name": "dcm-angular-ui",
-  "version": "0.1.11",
+  "version": "0.1.12",
   "homepage": "https://github.com/dell-oss/dcm-angular-ui",
   "description": "Angular UI components (grid, select, slider etc)",
   "license": "Apache-2.0",
@@ -9,6 +9,7 @@
     "dist/dcm-ui-helpers.js",
     "dist/dcm-ui-multiple-input.js",
     "dist/dcm-ui-password.js",
+    "dist/dcm-ui-position.js",
     "dist/dcm-ui-read-file.js",
     "dist/dcm-ui-resizable-cols.js",
     "dist/dcm-ui-select2.js",
@@ -27,16 +28,13 @@
   "devDependencies": {
     "angular": "~1.4",
     "angular-mocks": "~1.4",
-    "jquery": "~2.1.0",
     "bootstrap": "~3.1.1",
-    "fontawesome": "~4.0.3",
-    "underscore": "~1.6.0",
-    "marked": "~0.3.2",
+    "font-awesome": "fontawesome#~4.4.0",
     "google-code-prettify": "~1.0.1",
+    "jquery": "~2.1.0",
+    "marked": "~0.3.2",
     "select2": "~3.4.8",
-    "select2-bootstrap-css": "1.4.6"
-  },
-  "resolutions": {
-    "angular": "~1.4"
+    "select2-bootstrap-css": "1.4.6",
+    "underscore": "~1.6.0"
   }
 }

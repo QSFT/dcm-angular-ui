@@ -21,7 +21,7 @@ module.exports = function defaultDeployment() {
       ],
       stylesheets: [
         'assets/bower_components/bootstrap/dist/css/bootstrap.css',
-        'assets/bower_components/fontawesome/css/font-awesome.css',
+        'assets/bower_components/font-awesome/css/font-awesome.css',
         'assets/bower_components/select2/select2.css',
         'assets/bower_components/select2-bootstrap-css/select2-bootstrap.css'
       ],
@@ -43,7 +43,7 @@ module.exports = function defaultDeployment() {
       stylesheets: [
         'assets/style/cui.min.css',
         'assets/bower_components/bootstrap/dist/css/bootstrap.css',
-        'assets/bower_components/fontawesome/css/font-awesome.css',
+        'assets/bower_components/font-awesome/css/font-awesome.css',
         'assets/style/docs.css',
         'assets/style/prettify-theme.css',
         'assets/style/prettify.css'
@@ -52,7 +52,7 @@ module.exports = function defaultDeployment() {
         'assets/style/fonts/**',
         'assets/bower_components/bootstrap/dist/css/bootstrap.css.map',
         'assets/bower_components/select2/*.{png,gif}',
-        'assets/bower_components/fontawesome/fonts/**'
+        'assets/bower_components/font-awesome/fonts/**'
       ]
 
     }

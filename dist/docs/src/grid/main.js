@@ -50,6 +50,12 @@
                   </button>
               </div>
 
+              <div class="input-group input-group" style="margin-left: 5px; float: left;">
+                  <button class="btn btn btn-primary" ng-click="randomReload()">
+                     reload a row
+                  </button>
+              </div>
+
               <div class="input-group input-group" style="width: 175px; margin-left: 5px; float: right;">
                   <span class="input-group-addon">Records/Page</span>
                   <input type="number" class="form-control input" placeholder="Records" ng-model="paginationOptions.perPage">
@@ -144,6 +150,10 @@
               sort-order="datasource.sortOrder"
               edit-columns="serverGrid.cols"
               store-config="grid.testGridConfig"
+              open-row="serverGrid.loadRow"
+              reload-row="serverGrid.loadRow"
+              reload-trigger="serverGrid.triggerReload"
+              cache-opened-rows="true"
             >
 
               <dcm-grid-row ng-class="{muted: !isOnline}">
@@ -151,13 +161,24 @@
                     <span class="{{iconColor}}"><i class="fa {{icon}}"></i></span>
                 </dcm-grid-column>
                 <dcm-grid-column width="20%" title="IP Address" enabled="false">{{ip}}</dcm-grid-column>
-                <dcm-grid-column width="20%" title="Service Tag">{{serviceTag}}</dcm-grid-column>
+                <dcm-grid-column width="20%" title="Service Tag">{{serviceTag}} {{$row.active}}</dcm-grid-column>
                 <dcm-grid-column width="30%" title="Model">{{model}}</dcm-grid-column>
                 <dcm-grid-column width="20%" title="Memory" sort-type="integer" enabled="true">{{memory}}</dcm-grid-column>
               </dcm-grid-row>
 
+              <dcm-grid-row-status>
+                <i
+                  class="fa"
+                  ng-class="{
+                    'fa-spinner fa-pulse': $row.dataLoading,
+                    'fa-caret-down': !$row.dataLoading && $row.open,
+                    'fa-caret-right': !$row.dataLoading && $row.closed 
+                  }"
+                ></i>
+              </dcm-grid-row-status>
+
               <dcm-grid-row-actions ng-class="{muted: !isOnline}">
-                  We can include additional controls here for when a row is "active" (they are transcluded in the context of this row)
+                Extended info can go in here (transcluded in the context of the current row...)
               </dcm-grid-row-actions>
 
             </dcm-grid>
@@ -204,9 +225,15 @@
 
             $scope.showConfig = false;
 
+
+            $scope.randomReload = function() {
+              var row = $scope.datasource.pageData[Math.floor(Math.random() * $scope.datasource.pageData.length)];
+              $scope.serverGrid.triggerReload({'$$gridDataID': row.$$gridDataID});
+            }
+
             $scope.toggleConfig = function() {
               $scope.showConfig = !$scope.showConfig;
-            }
+            };
 
             // setup some dummy data...
 
@@ -236,7 +263,7 @@
 
               var isOnline = Math.random() > 0.1;
 
-              return{
+              var rowData = {
                 ip: genIP(),
                 isOnline: isOnline,
                 icon: isOnline ? 'fa-check-circle' : 'fa-exclamation-circle',
@@ -245,6 +272,8 @@
                 model: servers[ Math.floor(Math.random() * servers.length) ],
                 memory: ram[ Math.floor(Math.random() * ram.length) ] + ' GB'
               };
+
+              return rowData
             };
 
             var generateData = function() {
@@ -315,7 +344,16 @@
             // grid config...
             $scope.serverGrid = {
               activeServer: undefined,
-              selectedServers: []
+              selectedServers: [],
+              loadRow: function(row) {
+                var def = $q.defer();
+                // wait 2 seconds then resolve promise with existing data
+                $timeout(function(){
+                  def.resolve(row);
+                }, 2000);
+                return def.promise;
+              },
+              triggerReload: angular.noop
             };
 
             // pagination options
@@ -361,7 +399,7 @@
 
       .dcm-grid table.dcm-grid-table {
         table-layout: fixed;
-        border-collapse: separate;
+        border-collapse: collapse;
         border-top: solid 1px #e4e4e4;
         clear: both;
       }
@@ -544,14 +582,19 @@
       .dcm-grid table.dcm-grid-table > thead > tr > th.dcm-grid-activemarker,
       .dcm-grid table.dcm-grid-table > tbody > tr > td.dcm-grid-activemarker {
         padding: 0;
-        width: 3px;
+        width: 20px;
+        text-align: right;
+      }
+
+      .dcm-grid table.dcm-grid-table > tbody > tr > td.dcm-grid-row-loader {
+        text-align: center;
+        vertical-align: middle;
+        font-weight: heavy;
       }
 
       .dcm-grid table.dcm-grid-table > tbody > tr.dcm-grid-details > td.dcm-grid-activemarker,
       .dcm-grid table.dcm-grid-table > tbody > tr.active > td.dcm-grid-activemarker {
-        background-color: #009ae2;
-        border-bottom-color: #009ae2;
-        border-top-color: #009ae2;
+        border-left: solid 5px #009ae2;
       }
 
       .dcm-grid table.dcm-grid-table > tbody > tr:hover {
@@ -566,16 +609,10 @@
       .dcm-grid table.dcm-grid-table > tbody > tr.selected.active:hover > td {
         background: #ffffcc;
         color: #737373;
+      }
+
+      .dcm-grid table.dcm-grid-table > tbody > tr.selected.active > td {
         border-bottom-color: #ffffcc;
-      }
-
-      .dcm-grid table.dcm-grid-table > tbody > tr.selected.active:hover > td.dcm-grid-activemarker {
-        background-color: #009ae2;
-        border-bottom-color: #009ae2;
-      }
-
-      .dcm-grid table.dcm-grid-table > tbody > tr.dcm-grid-details.selected > td.dcm-grid-activemarker {
-        border-bottom-color: #009ae2;
       }
 
       .dcm-grid table.dcm-grid-table > tbody > tr.dcm-grid-details.selected > td,
@@ -622,7 +659,7 @@
         // Make sure the core table works.
         table.dcm-grid-table {
           table-layout: fixed;
-          border-collapse: separate;
+          border-collapse: collapse;
           border-top: solid 1px $dcm-grid-rowShadowColor;
           clear: both;  //for firefox
         }
@@ -739,18 +776,17 @@
 
           // Ensure the active row and its rowdetail are highlighted effectively.
           > thead > tr > th.dcm-grid-activemarker,
-          > tbody > tr > td.dcm-grid-activemarker { padding: 0; width: 3px; }
+          > tbody > tr > td.dcm-grid-activemarker { padding: 0 0 0 12px; width: 30px; text-aign: right; }
           > tbody > tr.dcm-grid-details > td.dcm-grid-activemarker,
-          > tbody > tr.active > td.dcm-grid-activemarker { background-color: $dcm-grid-activeColor; border-bottom-color: $dcm-grid-activeColor; border-top-color: $dcm-grid-activeColor; }
+          > tbody > tr.active > td.dcm-grid-activemarker { border-left: solid 5px $dcm-grid-activeColor; }
 
           // Define our hover and active states.
           > tbody > tr:hover { background: $dcm-grid-rowHoverColor; }
           > tbody > tr:hover > td { color: $dcm-grid-fontColorDark; }
           > tbody > tr.selected > td,
-          > tbody > tr.selected.active:hover > td { background: $dcm-grid-selectedBackgroundColor; color: $dcm-grid-fontColorDark; border-bottom-color: $dcm-grid-selectedBackgroundColor; }
-          > tbody > tr.selected.active:hover > td.dcm-grid-activemarker { background-color: $dcm-grid-activeColor; border-bottom-color: $dcm-grid-activeColor; }
+          > tbody > tr.selected.active:hover > td { background: $dcm-grid-selectedBackgroundColor; color: $dcm-grid-fontColorDark; }
+          > tbody > td.selected.active > td { border-bottom-color: $dcm-grid-activeColor; }
 
-          > tbody > tr.dcm-grid-details.selected > td.dcm-grid-activemarker { border-bottom-color: $dcm-grid-activeColor; }
           > tbody > tr.dcm-grid-details.selected > td,
           > tbody > tr.dcm-grid-details.selected:hover > td { border-bottom-color: $dcm-grid-rowShadowColor; color: $text-color; }
           > tbody > tr.dcm-grid-details:hover > td { border-bottom-color: $dcm-grid-rowShadowColor; color: $text-color; }
