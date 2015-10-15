@@ -23,7 +23,7 @@ $dcm-grid-rowGradientBottom:         lighten($dcm-grid-baseColor, 2%) !default;
   // Make sure the core table works.
   table.dcm-grid-table {
     table-layout: fixed;
-    border-collapse: separate;
+    border-collapse: collapse;
     border-top: solid 1px $dcm-grid-rowShadowColor;
     clear: both;  //for firefox
   }
@@ -140,18 +140,17 @@ $dcm-grid-rowGradientBottom:         lighten($dcm-grid-baseColor, 2%) !default;
 
     // Ensure the active row and its rowdetail are highlighted effectively.
     > thead > tr > th.dcm-grid-activemarker,
-    > tbody > tr > td.dcm-grid-activemarker { padding: 0; width: 3px; }
+    > tbody > tr > td.dcm-grid-activemarker { padding: 0 0 0 12px; width: 30px; text-aign: right; }
     > tbody > tr.dcm-grid-details > td.dcm-grid-activemarker,
-    > tbody > tr.active > td.dcm-grid-activemarker { background-color: $dcm-grid-activeColor; border-bottom-color: $dcm-grid-activeColor; border-top-color: $dcm-grid-activeColor; }
+    > tbody > tr.active > td.dcm-grid-activemarker { border-left: solid 5px $dcm-grid-activeColor; }
 
     // Define our hover and active states.
     > tbody > tr:hover { background: $dcm-grid-rowHoverColor; }
     > tbody > tr:hover > td { color: $dcm-grid-fontColorDark; }
     > tbody > tr.selected > td,
-    > tbody > tr.selected.active:hover > td { background: $dcm-grid-selectedBackgroundColor; color: $dcm-grid-fontColorDark; border-bottom-color: $dcm-grid-selectedBackgroundColor; }
-    > tbody > tr.selected.active:hover > td.dcm-grid-activemarker { background-color: $dcm-grid-activeColor; border-bottom-color: $dcm-grid-activeColor; }
+    > tbody > tr.selected.active:hover > td { background: $dcm-grid-selectedBackgroundColor; color: $dcm-grid-fontColorDark; }
+    > tbody > td.selected.active > td { border-bottom-color: $dcm-grid-activeColor; }
 
-    > tbody > tr.dcm-grid-details.selected > td.dcm-grid-activemarker { border-bottom-color: $dcm-grid-activeColor; }
     > tbody > tr.dcm-grid-details.selected > td,
     > tbody > tr.dcm-grid-details.selected:hover > td { border-bottom-color: $dcm-grid-rowShadowColor; color: $text-color; }
     > tbody > tr.dcm-grid-details:hover > td { border-bottom-color: $dcm-grid-rowShadowColor; color: $text-color; }

@@ -6,9 +6,15 @@ angular.module('dcm-ui.grid')
 
       $scope.showConfig = false;
 
+
+      $scope.randomReload = function() {
+        var row = $scope.datasource.pageData[Math.floor(Math.random() * $scope.datasource.pageData.length)];
+        $scope.serverGrid.triggerReload({'$$gridDataID': row.$$gridDataID});
+      }
+
       $scope.toggleConfig = function() {
         $scope.showConfig = !$scope.showConfig;
-      }
+      };
 
       // setup some dummy data...
 
@@ -38,7 +44,7 @@ angular.module('dcm-ui.grid')
 
         var isOnline = Math.random() > 0.1;
 
-        return{
+        var rowData = {
           ip: genIP(),
           isOnline: isOnline,
           icon: isOnline ? 'fa-check-circle' : 'fa-exclamation-circle',
@@ -47,6 +53,8 @@ angular.module('dcm-ui.grid')
           model: servers[ Math.floor(Math.random() * servers.length) ],
           memory: ram[ Math.floor(Math.random() * ram.length) ] + ' GB'
         };
+
+        return rowData
       };
 
       var generateData = function() {
@@ -117,7 +125,16 @@ angular.module('dcm-ui.grid')
       // grid config...
       $scope.serverGrid = {
         activeServer: undefined,
-        selectedServers: []
+        selectedServers: [],
+        loadRow: function(row) {
+          var def = $q.defer();
+          // wait 2 seconds then resolve promise with existing data
+          $timeout(function(){
+            def.resolve(row);
+          }, 2000);
+          return def.promise;
+        },
+        triggerReload: angular.noop
       };
 
       // pagination options

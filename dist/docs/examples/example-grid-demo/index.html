@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
   <title>Example - example-grid-demo</title>
   <link href="../../assets/bower_components/bootstrap/dist/css/bootstrap.css" rel="stylesheet" type="text/css">
-  <link href="../../assets/bower_components/fontawesome/css/font-awesome.css" rel="stylesheet" type="text/css">
+  <link href="../../assets/bower_components/font-awesome/css/font-awesome.css" rel="stylesheet" type="text/css">
   <link href="../../assets/bower_components/select2/select2.css" rel="stylesheet" type="text/css">
   <link href="../../assets/bower_components/select2-bootstrap-css/select2-bootstrap.css" rel="stylesheet" type="text/css">
   <link href="dcm-grid-from-scss.css" rel="stylesheet" type="text/css">
@@ -29,6 +29,7 @@
   <script src="../../src/grid/directives/dcmGridDirective.js"></script>
   <script src="../../src/grid/directives/dcmGridRowActionsDirective.js"></script>
   <script src="../../src/grid/directives/dcmGridRowDirective.js"></script>
+  <script src="../../src/grid/directives/dcmGridRowStatus.js"></script>
   <script src="../../src/grid/services/datasource.js"></script>
   <script src="../../src/grid/services/filters.js"></script>
   <script src="../../src/helpers/services/drag.js"></script>
@@ -78,6 +79,12 @@
         <div class="input-group input-group" style="margin-left: 5px; float: left;">
             <button class="btn btn btn-primary" ng-click="datasource.loadData()">
               <i ng-if="datasource.bLoading || datasource.bFiltering" class="fa fa-spin fa-spinner"></i> reload
+            </button>
+        </div>
+
+        <div class="input-group input-group" style="margin-left: 5px; float: left;">
+            <button class="btn btn btn-primary" ng-click="randomReload()">
+               reload a row
             </button>
         </div>
 
@@ -175,6 +182,10 @@
         sort-order="datasource.sortOrder"
         edit-columns="serverGrid.cols"
         store-config="grid.testGridConfig"
+        open-row="serverGrid.loadRow"
+        reload-row="serverGrid.loadRow"
+        reload-trigger="serverGrid.triggerReload"
+        cache-opened-rows="true"
       >
 
         <dcm-grid-row ng-class="{muted: !isOnline}">
@@ -182,13 +193,24 @@
               <span class="{{iconColor}}"><i class="fa {{icon}}"></i></span>
           </dcm-grid-column>
           <dcm-grid-column width="20%" title="IP Address" enabled="false">{{ip}}</dcm-grid-column>
-          <dcm-grid-column width="20%" title="Service Tag">{{serviceTag}}</dcm-grid-column>
+          <dcm-grid-column width="20%" title="Service Tag">{{serviceTag}} {{$row.active}}</dcm-grid-column>
           <dcm-grid-column width="30%" title="Model">{{model}}</dcm-grid-column>
           <dcm-grid-column width="20%" title="Memory" sort-type="integer" enabled="true">{{memory}}</dcm-grid-column>
         </dcm-grid-row>
 
+        <dcm-grid-row-status>
+          <i
+            class="fa"
+            ng-class="{
+              'fa-spinner fa-pulse': $row.dataLoading,
+              'fa-caret-down': !$row.dataLoading && $row.open,
+              'fa-caret-right': !$row.dataLoading && $row.closed 
+            }"
+          ></i>
+        </dcm-grid-row-status>
+
         <dcm-grid-row-actions ng-class="{muted: !isOnline}">
-            We can include additional controls here for when a row is "active" (they are transcluded in the context of this row)
+          Extended info can go in here (transcluded in the context of the current row...)
         </dcm-grid-row-actions>
 
       </dcm-grid>
