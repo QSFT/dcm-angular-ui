@@ -172,7 +172,7 @@
                   ng-class="{
                     'fa-spinner fa-pulse': $row.dataLoading,
                     'fa-caret-down': !$row.dataLoading && $row.open,
-                    'fa-caret-right': !$row.dataLoading && $row.closed 
+                    'fa-caret-right': !$row.dataLoading && $row.closed
                   }"
                 ></i>
               </dcm-grid-row-status>
@@ -276,6 +276,7 @@
               return rowData
             };
 
+            // generates fake data
             var generateData = function() {
 
               var def = $q.defer();
@@ -296,11 +297,9 @@
                 def.notify(rawData);
 
                 if (pageNo++ < parseInt($scope.dsOpts.iterations,10)) {
-
                   $timeout(function(){
                     sendData();
                   }, 500 );
-
                 } else {
                   def.resolve();
                 }
@@ -1533,6 +1532,7 @@ angular.module('dcm-ui.grid')
 
 
     ctrl.updateRowData = function(record, data) {
+
       // update in datasource
       angular.extend(record.data, data);
       // update in row scope
@@ -1561,21 +1561,32 @@ angular.module('dcm-ui.grid')
     };
 
 
-    ctrl.reloadTrigger = function(findRow) {
+    // newData is optional, if not provided ctrl.reloadRow will be used
+    ctrl.reloadTrigger = function(findRow, newData) {
 
-      var rowRecord = _.findWhere(ctrl.aRows, findRow);
+      var thisRow = _.findWhere(ctrl.aRows, findRow);
+
 
       // if it's not visible anymore then it won't have been found
-      if (rowRecord) {
-        rowRecord = ctrl.getGridData(rowRecord);
+      if (thisRow) {
+        var rowRecord = ctrl.getGridData(thisRow);
 
-        var dataPromise = ctrl.reloadRow(rowRecord.data);
+        var dataPromise = newData || ctrl.reloadRow(rowRecord.data);
+
         loadingDelay(rowRecord, dataPromise);
 
         $q.when(dataPromise).then(function(data){
           ctrl.updateRowData(rowRecord, data);
           rowRecord.scope.$row.openCached = false;
+          // if this row is currently open then we need to reload the extra data
+          // this will close it while extra data loads
+          if (rowRecord.scope.$row.open) {
+            ctrl.setActiveRow(rowRecord.data);
+          }
+
         });
+
+
 
       }
 
@@ -2046,9 +2057,10 @@ angular.module('dcm-ui.grid')
 
               record = ctrl.getGridData(rowData);
 
-              // if this row does not have a record setup or the data has changed
+              // if this row does not have a record setup
               // create a new record for it
-              if (!record || !_.isEqual(record.lastValue,rowData) ) {
+              if (!record) {
+
                 // create a new scope for the transcluded row options
                 var newScope = scope.$new(false);
                 var thisRow = rowData;
@@ -2064,11 +2076,6 @@ angular.module('dcm-ui.grid')
                   angular.extend(newScope, ctrl.additionalRowData);
                 }
 
-                // if there is a loader configured add it to the scope
-                // if (ctrl.bRowLoader) {
-                //   newScope.$$load = ctrl.rowLoader.call(newScope);
-                // }
-
                 newScope.$row = {
                   checked: (_.indexOf(aSelected, thisRow) !== -1) ? true : false,
                   data: thisRow,
@@ -2080,11 +2087,9 @@ angular.module('dcm-ui.grid')
                   closed: ctrl.bRowActions ? true : false
                 };
 
-
                 angular.extend(thisRecord, {
                   scope: newScope,
                   data: thisRow,
-                  lastValue: _.clone(thisRow),
                   id: id
                 });
 
@@ -2270,7 +2275,6 @@ angular.module('dcm-ui.grid')
           dcmGridCtrl.rowActionContent = $.trim(tElement.html());
           dcmGridCtrl.bRowActions = true;
 
-
           // copy over any attributes that aren't in our scope
           var attributes = {};
           angular.forEach(attrs, function(obj, key){
@@ -2437,6 +2441,9 @@ angular.module('dcm-ui.grid')
         // i.e returned data {data: [1,2,3], complete: false, token: 'xyz'}
 
         // will continue poling until complete is true
+
+
+        var requestRow = options.requestRowFunction || _.identity;
 
         if (!options.hasOwnProperty('requestDataFunction')) {
           options.requestDataFunction = function(options){
@@ -2655,10 +2662,11 @@ angular.module('dcm-ui.grid')
               var prevProcessDataTime = 0;
               var prevProcessStartTime = 0;
 
-              var promise =  options.requestDataFunction(requestOptions);
               var preRequestTime = new Date();
 
-              promise.then(function(){
+              datasource.dataLoadingPromise =  options.requestDataFunction(requestOptions);
+
+              datasource.dataLoadingPromise.then(function(){
 
                 datasource.bLoading = false;
 
@@ -2914,6 +2922,7 @@ angular.module('dcm-ui.grid')
         var datasource = {
 
           bLoading: false,
+          dataLoadingPromise: undefined,
           bFiltering: false,
           bFilterValid: true,
           bOptionsValid: true,
@@ -2943,6 +2952,54 @@ angular.module('dcm-ui.grid')
           loadData: function() {
             datasource.bPaused = false;
             requestData();
+          },
+
+
+          // newData is optional, if not passed match will be passed to the requestRow
+          // function to get the data
+          triggerRowReload: function(match, newData) {
+            // resolve this promise with the new data
+            var reloadPromise = $q.defer();
+
+            // make sure the grid actually has data (in case auto load is disabled)
+            if (datasource.dataLoadingPromise) {
+              // make sure initial data is loaded before starting update/add
+              datasource.dataLoadingPromise.then(function(){
+
+                var newDataPromise = newData || requestRow(match);
+
+                // load the new data
+                $q.when(newDataPromise).then(function(data){
+
+                  // if there is a record for this row update it, otherwise this is a new row!
+                  var rowRecord = _.findWhere(datasource.data, match);
+                  if (rowRecord) {
+                    // if the data is null then remove the matching row
+                    if (data) {
+                      angular.extend(rowRecord, data);
+                      $log.info('DATASOURCE: updating existing row', rowRecord);
+                    } else {
+                      $log.info('DATASOURCE: removing existing row', rowRecord);
+                      datasource.data.splice(datasource.data.indexOf(rowRecord), 1);
+                    }
+                  } else {
+                    // if we actually have data (i.e it isn't something that was
+                    // deleted before it existed) add it to the data
+                    if (data) {
+                      $log.info('DATASOURCE: adding new row', data);
+                      datasource.data.push(data);
+                    }
+                  }
+                  // resort/paginate the data
+                  sortData();
+                  reloadPromise.resolve(data);
+
+                }, reloadPromise.reject);
+
+              });
+            }
+
+            return reloadPromise.promise;
           },
 
           cancelRequest: function() {
