@@ -725,6 +725,7 @@ angular.module('dcm-ui.grid')
 
 
     ctrl.updateRowData = function(record, data) {
+
       // update in datasource
       angular.extend(record.data, data);
       // update in row scope
@@ -753,21 +754,32 @@ angular.module('dcm-ui.grid')
     };
 
 
-    ctrl.reloadTrigger = function(findRow) {
+    // newData is optional, if not provided ctrl.reloadRow will be used
+    ctrl.reloadTrigger = function(findRow, newData) {
 
-      var rowRecord = _.findWhere(ctrl.aRows, findRow);
+      var thisRow = _.findWhere(ctrl.aRows, findRow);
+
 
       // if it's not visible anymore then it won't have been found
-      if (rowRecord) {
-        rowRecord = ctrl.getGridData(rowRecord);
+      if (thisRow) {
+        var rowRecord = ctrl.getGridData(thisRow);
 
-        var dataPromise = ctrl.reloadRow(rowRecord.data);
+        var dataPromise = newData || ctrl.reloadRow(rowRecord.data);
+
         loadingDelay(rowRecord, dataPromise);
 
         $q.when(dataPromise).then(function(data){
           ctrl.updateRowData(rowRecord, data);
           rowRecord.scope.$row.openCached = false;
+          // if this row is currently open then we need to reload the extra data
+          // this will close it while extra data loads
+          if (rowRecord.scope.$row.open) {
+            ctrl.setActiveRow(rowRecord.data);
+          }
+
         });
+
+
 
       }
 

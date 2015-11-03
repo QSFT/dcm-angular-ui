@@ -32,7 +32,6 @@ angular.module('dcm-ui.grid')
           dcmGridCtrl.rowActionContent = $.trim(tElement.html());
           dcmGridCtrl.bRowActions = true;
 
-
           // copy over any attributes that aren't in our scope
           var attributes = {};
           angular.forEach(attrs, function(obj, key){

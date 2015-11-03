@@ -172,7 +172,7 @@
                   ng-class="{
                     'fa-spinner fa-pulse': $row.dataLoading,
                     'fa-caret-down': !$row.dataLoading && $row.open,
-                    'fa-caret-right': !$row.dataLoading && $row.closed 
+                    'fa-caret-right': !$row.dataLoading && $row.closed
                   }"
                 ></i>
               </dcm-grid-row-status>
@@ -276,6 +276,7 @@
               return rowData
             };
 
+            // generates fake data
             var generateData = function() {
 
               var def = $q.defer();
@@ -296,11 +297,9 @@
                 def.notify(rawData);
 
                 if (pageNo++ < parseInt($scope.dsOpts.iterations,10)) {
-
                   $timeout(function(){
                     sendData();
                   }, 500 );
-
                 } else {
                   def.resolve();
                 }

@@ -1141,6 +1141,27 @@ describe('Directive: dcmGrid,', function () {
 
       });
 
+      it('should not call the reload function when the new data (or promise) is provided to the reload trigger', function(){
+
+        scope.reloadFn({roleId: 2}, defer.promise);
+        scope.$digest();
+
+        expect(scope.loadDataFn).not.toHaveBeenCalled();
+
+        // row should now be in loading state
+        state = getState(element.find('tbody tr:first'));
+        expect(scope.testData[0].name).toBe('Admin');
+
+        // resolve the open row request with aditional data
+        defer.resolve({name: 'Admiral Fancypants'});
+        scope.$digest();
+
+        // row should now contain the additional data and be in the open state
+        state = getState(element.find('tbody tr:first'));
+        expect(scope.testData[0].name).toBe('Admiral Fancypants');
+
+      });
+
 
 
   });

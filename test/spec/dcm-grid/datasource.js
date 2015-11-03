@@ -931,4 +931,140 @@ describe('Service: datasource', function () {
 
   });
 
+
+  describe('trigger row reload function', function(){
+
+    var ds;
+
+    beforeEach(function(){
+
+      scope.loadOptions.requestRowFunction = jasmine.createSpy('request row function');
+
+      ds = datasource.create(scope, scope.loadOptions);
+
+      // make the names sorted by alpha
+      ds.sortFunction = function(a) {
+        return (a.name.toLowerCase());
+      };
+
+      // load data
+      $rootScope.$digest();
+      $timeout.flush();
+      $httpBackend.flush();
+      $timeout.flush();
+
+    });
+
+
+    it('should be able to reload a single row and reapply sort/pagination', function () {
+
+      scope.loadOptions.requestRowFunction.and.callFake(function(row){
+        row.name = 'a ' + row.name + ' the first of his name';
+        return row;
+      });
+
+      var match = angular.copy(sampleData[1]);
+      ds.triggerRowReload(match);
+
+      // digest + flush timeout to allow new sorting
+      $rootScope.$digest();
+      $timeout.flush();
+
+      expect(scope.loadOptions.requestRowFunction).toHaveBeenCalledWith(match);
+      expect(ds.viewData[0].name).toBe('a ' + sampleData[1].name + ' the first of his name');
+      expect(ds.viewData[2].name).toBe('bob smith');
+
+    });
+
+
+    it('should be able to add a new row to the dataset if reload is triggered on an unknown row', function () {
+
+      scope.loadOptions.requestRowFunction.and.callFake(_.identity);
+
+      var match = { name: 'aardvarky albertson', someId: 11, otherField: 'f'};
+      ds.triggerRowReload(match);
+
+      // digest + flush timeout to allow new sorting
+      $rootScope.$digest();
+      $timeout.flush();
+
+      expect(ds.viewData[0]).toBe(match);
+
+    });
+
+    it('should not add a new row to the dataset if reload is triggered on an unknown row but returns no data', function () {
+
+      expect(ds.data.length).toBe(4);
+
+      scope.loadOptions.requestRowFunction.and.callFake(angular.noop);
+      var match = { name: 'aardvarky albertson', someId: 11, otherField: 'f'};
+      ds.triggerRowReload(match);
+
+      // digest + flush timeout to allow new sorting
+      $rootScope.$digest();
+      $timeout.flush();
+
+      // should not be any new rowsz
+      expect(ds.data.length).toBe(4);
+
+    });
+
+
+    it('should be able to reload a single row and reapply sort/pagination with new data provided to triggerReload', function () {
+
+      var match = angular.copy(sampleData[1]);
+      ds.triggerRowReload(match, {name: 'a ' + sampleData[1].name + ' the first of his name'});
+
+      // digest + flush timeout to allow new sorting
+      $rootScope.$digest();
+      $timeout.flush();
+
+      expect(ds.viewData[0].name).toBe('a ' + sampleData[1].name + ' the first of his name');
+      expect(ds.viewData[2].name).toBe('bob smith');
+
+    });
+
+    it('should delete row if the reloaded data is null/undefined', function () {
+
+      scope.loadOptions.requestRowFunction.and.callFake(function(){
+        return null;
+      });
+
+      var match = angular.copy(sampleData[1]);
+
+      expect(ds.data.length).toBe(4);
+      expect(_.findWhere(ds.data, match)).toEqual(sampleData[1]);
+
+      ds.triggerRowReload(match);
+
+      // digest + flush timeout to allow new sorting
+      $rootScope.$digest();
+      $timeout.flush();
+
+      expect(ds.data.length).toBe(3);
+      expect(_.findWhere(ds.data, match)).toBe(undefined);
+
+    });
+
+    it('should delete row if the reloaded data is null/undefined with data provided to triggerReload', function () {
+
+      var match = angular.copy(sampleData[1]);
+
+      expect(ds.data.length).toBe(4);
+      expect(_.findWhere(ds.data, match)).toEqual(sampleData[1]);
+
+      ds.triggerRowReload(match, undefined);
+
+      // digest + flush timeout to allow new sorting
+      $rootScope.$digest();
+      $timeout.flush();
+
+      expect(ds.data.length).toBe(3);
+      expect(_.findWhere(ds.data, match)).toBe(undefined);
+
+    });
+
+
+});
+
 });
