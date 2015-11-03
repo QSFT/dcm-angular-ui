@@ -57,6 +57,7 @@ angular.module('dcm-ui.grid')
         return rowData
       };
 
+      // generates fake data
       var generateData = function() {
 
         var def = $q.defer();
@@ -77,11 +78,9 @@ angular.module('dcm-ui.grid')
           def.notify(rawData);
 
           if (pageNo++ < parseInt($scope.dsOpts.iterations,10)) {
-
             $timeout(function(){
               sendData();
             }, 500 );
-
           } else {
             def.resolve();
           }

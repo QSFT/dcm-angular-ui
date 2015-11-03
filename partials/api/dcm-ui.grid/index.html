@@ -179,7 +179,7 @@ Also includes a service for managing the grid datasource and filters.</p>
               ng-class=&quot;{
                 &#39;fa-spinner fa-pulse&#39;: $row.dataLoading,
                 &#39;fa-caret-down&#39;: !$row.dataLoading &amp;&amp; $row.open,
-                &#39;fa-caret-right&#39;: !$row.dataLoading &amp;&amp; $row.closed 
+                &#39;fa-caret-right&#39;: !$row.dataLoading &amp;&amp; $row.closed
               }&quot;
             &gt;&lt;/i&gt;
           &lt;/dcm-grid-row-status&gt;
@@ -283,6 +283,7 @@ Also includes a service for managing the grid datasource and filters.</p>
           return rowData
         };
 
+        // generates fake data
         var generateData = function() {
 
           var def = $q.defer();
@@ -303,11 +304,9 @@ Also includes a service for managing the grid datasource and filters.</p>
             def.notify(rawData);
 
             if (pageNo++ &lt; parseInt($scope.dsOpts.iterations,10)) {
-
               $timeout(function(){
                 sendData();
               }, 500 );
-
             } else {
               def.resolve();
             }
