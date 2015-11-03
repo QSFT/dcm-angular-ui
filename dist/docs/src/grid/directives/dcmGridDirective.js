@@ -330,9 +330,10 @@ angular.module('dcm-ui.grid')
 
               record = ctrl.getGridData(rowData);
 
-              // if this row does not have a record setup or the data has changed
+              // if this row does not have a record setup
               // create a new record for it
-              if (!record || !_.isEqual(record.lastValue,rowData) ) {
+              if (!record) {
+
                 // create a new scope for the transcluded row options
                 var newScope = scope.$new(false);
                 var thisRow = rowData;
@@ -348,11 +349,6 @@ angular.module('dcm-ui.grid')
                   angular.extend(newScope, ctrl.additionalRowData);
                 }
 
-                // if there is a loader configured add it to the scope
-                // if (ctrl.bRowLoader) {
-                //   newScope.$$load = ctrl.rowLoader.call(newScope);
-                // }
-
                 newScope.$row = {
                   checked: (_.indexOf(aSelected, thisRow) !== -1) ? true : false,
                   data: thisRow,
@@ -364,11 +360,9 @@ angular.module('dcm-ui.grid')
                   closed: ctrl.bRowActions ? true : false
                 };
 
-
                 angular.extend(thisRecord, {
                   scope: newScope,
                   data: thisRow,
-                  lastValue: _.clone(thisRow),
                   id: id
                 });
 
