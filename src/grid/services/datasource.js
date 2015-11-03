@@ -68,6 +68,9 @@ angular.module('dcm-ui.grid')
 
         // will continue poling until complete is true
 
+
+        var requestRow = options.requestRowFunction || _.identity;
+
         if (!options.hasOwnProperty('requestDataFunction')) {
           options.requestDataFunction = function(options){
 
@@ -285,10 +288,11 @@ angular.module('dcm-ui.grid')
               var prevProcessDataTime = 0;
               var prevProcessStartTime = 0;
 
-              var promise =  options.requestDataFunction(requestOptions);
               var preRequestTime = new Date();
 
-              promise.then(function(){
+              datasource.dataLoadingPromise =  options.requestDataFunction(requestOptions);
+
+              datasource.dataLoadingPromise.then(function(){
 
                 datasource.bLoading = false;
 
@@ -544,6 +548,7 @@ angular.module('dcm-ui.grid')
         var datasource = {
 
           bLoading: false,
+          dataLoadingPromise: undefined,
           bFiltering: false,
           bFilterValid: true,
           bOptionsValid: true,
@@ -573,6 +578,54 @@ angular.module('dcm-ui.grid')
           loadData: function() {
             datasource.bPaused = false;
             requestData();
+          },
+
+
+          // newData is optional, if not passed match will be passed to the requestRow
+          // function to get the data
+          triggerRowReload: function(match, newData) {
+            // resolve this promise with the new data
+            var reloadPromise = $q.defer();
+
+            // make sure the grid actually has data (in case auto load is disabled)
+            if (datasource.dataLoadingPromise) {
+              // make sure initial data is loaded before starting update/add
+              datasource.dataLoadingPromise.then(function(){
+
+                var newDataPromise = newData || requestRow(match);
+
+                // load the new data
+                $q.when(newDataPromise).then(function(data){
+
+                  // if there is a record for this row update it, otherwise this is a new row!
+                  var rowRecord = _.findWhere(datasource.data, match);
+                  if (rowRecord) {
+                    // if the data is null then remove the matching row
+                    if (data) {
+                      angular.extend(rowRecord, data);
+                      $log.info('DATASOURCE: updating existing row', rowRecord);
+                    } else {
+                      $log.info('DATASOURCE: removing existing row', rowRecord);
+                      datasource.data.splice(datasource.data.indexOf(rowRecord), 1);
+                    }
+                  } else {
+                    // if we actually have data (i.e it isn't something that was
+                    // deleted before it existed) add it to the data
+                    if (data) {
+                      $log.info('DATASOURCE: adding new row', data);
+                      datasource.data.push(data);
+                    }
+                  }
+                  // resort/paginate the data
+                  sortData();
+                  reloadPromise.resolve(data);
+
+                }, reloadPromise.reject);
+
+              });
+            }
+
+            return reloadPromise.promise;
           },
 
           cancelRequest: function() {
