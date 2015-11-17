@@ -381,13 +381,14 @@ angular.module('dcm-ui.select2')
             // update select2 to reflect model change
 
             if (isBlank(value)) {
-              var blank = opts.multiple ? [] : '';
+              var blankVal = opts.multiple ? [] : '';
+              var blankData = opts.multiple ? [] : null;
               // make sure the model is set correctly
-              if (!angular.equals(value, blank)) {
-                $parse(attrs.ngModel).assign(scope, blank);
+              if (!angular.equals(value, blankVal)) {
+                $parse(attrs.ngModel).assign(scope, blankVal);
               }
-              element.select2('data',blank, false); // will not trigger initSelection
-              modelObjectSetter(scope, blank); // clear model-selection as init isn't called
+              element.select2('data',blankData, false); // will not trigger initSelection
+              modelObjectSetter(scope, blankData); // clear model-selection as init isn't called
             } else {
               // set the sticky in case the data isn't ready yet
               if (attrs.sticky) {
