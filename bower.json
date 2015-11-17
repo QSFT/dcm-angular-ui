@@ -1,6 +1,6 @@
 {
   "name": "dcm-angular-ui",
-  "version": "0.1.14",
+  "version": "0.1.15",
   "homepage": "https://github.com/dell-oss/dcm-angular-ui",
   "description": "Angular UI components (grid, select, slider etc)",
   "license": "Apache-2.0",

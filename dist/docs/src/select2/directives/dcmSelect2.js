@@ -340,8 +340,16 @@ angular.module('dcm-ui.select2')
 
 
           angular.extend(opts, options, scope.$eval(attrs.dcmSelect2));
-
           element.select2(opts);
+
+          // watch options for updates
+          scope.$watch($parse(attrs.dcmSelect2), function(newOpts, oldOpts){
+            if (newOpts && newOpts !== oldOpts) {
+              angular.extend(opts, newOpts);
+              element.select2(opts);
+            }
+          });
+
 
           // the change event should only occur when the user changes the selection
           element.on('change', function(evt){
