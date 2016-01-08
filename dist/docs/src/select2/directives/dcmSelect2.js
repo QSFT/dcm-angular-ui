@@ -57,7 +57,7 @@ angular.module('dcm-ui.select2')
           var iconField = attrs.iconField || 'icon';
 
           var modelObjectSetter = (attrs.modelSelected) ? $parse(attrs.modelSelected).assign : angular.noop;
-
+          var ngModelSetter = $parse(attrs.ngModel).assign;
           var optGroupSetter = (attrs.selectedOptGroup) ? $parse(attrs.selectedOptGroup).assign : angular.noop;
           var optGroupGetter = (attrs.selectedOptGroup) ? $parse(attrs.selectedOptGroup) : angular.noop;
           var optGroupIdField = attrs.optGroupIdField || 'id';
@@ -310,15 +310,14 @@ angular.module('dcm-ui.select2')
 
                 // return the callback with the actual object
                 callback(oData.objectData);
-                // update the view value in the model without setting it dirty
-                modelController.$viewValue = oData.idData;
+
                 // set the selected object in the model
                 modelObjectSetter(scope, oData.objectData);
 
                 // update the model if required (intial value was invalid)
                 // also sets it if it was previously undefined
                 if (isBlank(oData.idData)) {
-                  $parse(attrs.ngModel).assign(scope, oData.idData);
+                  ngModelSetter(scope, oData.idData);
                 }
 
               });
@@ -360,14 +359,9 @@ angular.module('dcm-ui.select2')
               // update the form field controller
               modelController.$setViewValue(evt.val);
               // set the model
-              $parse(attrs.ngModel).assign(scope, evt.val);
+              ngModelSetter(scope, evt.val);
               // set the selected object in the model
               modelObjectSetter(scope, element.select2('data'));
-
-              // set the sticky value if provided
-              if (attrs.sticky) {
-                $parse(attrs.sticky).assign(scope, evt.val);
-              }
 
             });
 
@@ -393,15 +387,11 @@ angular.module('dcm-ui.select2')
               var blankData = opts.multiple ? [] : null;
               // make sure the model is set correctly
               if (!angular.equals(value, blankVal)) {
-                $parse(attrs.ngModel).assign(scope, blankVal);
+                ngModelSetter(scope, blankVal);
               }
               element.select2('data',blankData, false); // will not trigger initSelection
               modelObjectSetter(scope, blankData); // clear model-selection as init isn't called
             } else {
-              // set the sticky in case the data isn't ready yet
-              if (attrs.sticky) {
-                $parse(attrs.sticky).assign(scope, value);
-              }
               element.select2('val',value, false);
             }
 
@@ -413,8 +403,7 @@ angular.module('dcm-ui.select2')
               if (!angular.equals(value,element.select2('data')) ) {
                 element.select2('data',value, false);
                 var selectedID = element.select2('val');
-                modelController.$viewValue = selectedID;
-                $parse(attrs.ngModel).assign(scope, selectedID);
+                ngModelSetter(scope, selectedID);
               }
             });
           }
@@ -427,8 +416,8 @@ angular.module('dcm-ui.select2')
             // if it's not defined yet set it to an empty string
             var currentVal = element.select2('val');
 
-            // we need to check the value if there is one set, or if there isn't one set, set the sticky if defined
-            if (attrs.sticky || !isBlank(currentVal) ) {
+            // we need to check the value if there is one set
+            if (!isBlank(currentVal) ) {
 
               // if it changed to a promise, then we need to wait for it to finish...
               $q.when(val).then(function(newData){
@@ -437,11 +426,6 @@ angular.module('dcm-ui.select2')
 
                 var validateValue = currentVal;
 
-                // if we need to attempt setting to the sticky...
-                if (attrs.sticky && isBlank(currentVal)) {
-                  validateValue = $parse(attrs.sticky)(scope);
-                }
-
                 oData = validateSelection(newData, validateValue);
 
                 if (!angular.equals(currentVal, oData.idData)) {
@@ -449,8 +433,7 @@ angular.module('dcm-ui.select2')
                   // clear the selection
                   element.select2('data', oData.objectData, false);
                   modelObjectSetter(scope,oData.objectData);
-                  modelController.$viewValue = oData.idData;
-                  $parse(attrs.ngModel).assign(scope, oData.idData);
+                  ngModelSetter(scope, oData.idData);
 
                 }
 
