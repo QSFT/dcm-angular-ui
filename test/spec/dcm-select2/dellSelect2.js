@@ -653,41 +653,6 @@ describe('Directive: dcmSelect2', function () {
   });
 
 
-
-  it('should set the sticky value when a user selects a value', function(){
-
-    scope.stickyVal = '';
-    scope.selectedVal = '';
-
-    var element = angular.element('<input type="hidden" dcm-select2 ng-model="selectedVal" sticky="stickyVal" model-selected="selectedObject" data="minimalData"/>');
-    host.append(element);
-    compile(host)(scope);
-    scope.$digest();
-
-    selectAsUser(element,1);
-
-    expect(scope.selectedVal).toBe('user1');
-    expect(scope.stickyVal).toBe('user1');
-
-  });
-
-
-  it('should use the sticky value when no value has been selected', function(){
-
-    scope.stickyVal = 'user1';
-    scope.selectedVal = '';
-    scope.selectedObject = null;
-
-    var element = angular.element('<input type="hidden" dcm-select2 ng-model="selectedVal" sticky="stickyVal" model-selected="selectedObject" data="minimalData"/>');
-    host.append(element);
-    compile(host)(scope);
-    scope.$digest();
-
-    expect(scope.selectedVal).toBe('user1');
-    expect(scope.stickyVal).toBe('user1');
-
-  });
-
   // nasty hackery to spy on the select 2 jquery function
   describe('jquery fn config', function(){
 
