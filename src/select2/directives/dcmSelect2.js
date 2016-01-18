@@ -378,6 +378,14 @@ angular.module('dcm-ui.select2')
             element.select2('readonly', !!value);
           });
 
+          // For multi select, make '[]' invalid for required
+          if (opts.multiple) {
+            var initialState = modelController.$isEmpty;
+            modelController.$isEmpty = function(value) {
+              return initialState.call(modelController, value) || value.length === 0;
+            };
+          }
+
           // watch model for changes, and change selection if required
           scope.$watch($parse(attrs.ngModel), function(value) {
             // update select2 to reflect model change
