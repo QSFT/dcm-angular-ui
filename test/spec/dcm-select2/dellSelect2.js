@@ -597,6 +597,19 @@ describe('Directive: dcmSelect2', function () {
 
   });
 
+  it('should find a required field with the multiple options and no selections to have an error', function() {
+
+    var element = angular.element('<input name="testSelector" required type="hidden" dcm-select2="{multiple:true}" ng-model="selectedVal" data="oddKeyData" id-field="xid" text-field="xtext" />');
+
+    $('<form name="testForm"></form>').append(element).appendTo(host);
+
+    // select2 requires the element to be in an actual page
+    compile(host)(scope);
+    scope.$digest();
+
+    expect(scope.testForm.testSelector.$error.required).toBe(true);
+
+  });
 
 
   it('should allow the selected object to be reflected in the model', function(){
